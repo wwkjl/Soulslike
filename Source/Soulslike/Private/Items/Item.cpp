@@ -9,33 +9,31 @@ AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
+	RootComponent = ItemMesh;
 }
 
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UE_LOG(LogTemp, Warning, TEXT("Hello World!"));
 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("Item OnScreen Message"));
-	}
+}
 
-	UWorld* World = GetWorld();
+float AItem::TransformedSin()
+{
+	// period = 2*pi/K
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
+}
 
-	if (World)
-	{
-		FVector Location = GetActorLocation();
-		FVector Forward = GetActorForwardVector();
-		DRAW_DEBUG_SPHERE(Location);
-		DRAW_DEBUG_VECTOR(Location, Location + Forward * 100.f);
-	}
+float AItem::TransformedCos()
+{
+	return Amplitude * FMath::Cos(RunningTime * TimeConstant);
 }
 
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	RunningTime += DeltaTime;
 }
 
