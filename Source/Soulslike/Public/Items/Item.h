@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+
+class USphereComponent;
+
 UCLASS()
 class SOULSLIKE_API AItem : public AActor
 {
@@ -31,6 +34,14 @@ protected:
 
 	template<typename T>
 	T Avg(T First, T Second);
+
+	//From Unreal\UE_5.1\Engine\Source\Runtime\Engine\Classes\Components\PrimitiveComponent.h in SIxParams
+	UFUNCTION()
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -40,6 +51,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* OverlapSphere;
 };
 
 template<typename T>
