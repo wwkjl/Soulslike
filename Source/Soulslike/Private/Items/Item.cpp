@@ -2,9 +2,9 @@
 
 
 #include "Items/Item.h"
-#include "DrawDebugHelpers.h"
 #include "Soulslike/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "Characters/SoulslikeCharacter.h"
 
 AItem::AItem()
 {
@@ -37,21 +37,19 @@ float AItem::TransformedCos()
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IA_Move Triggered"));
-	const FString OtherActorName = OtherActor->GetName();
-	if (GEngine)
+	ASoulslikeCharacter* SoulslikeCharacter = Cast<ASoulslikeCharacter>(OtherActor);
+	if (SoulslikeCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, OtherActorName);
+		SoulslikeCharacter->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("IA_Move Triggered End"));
-	const FString OtherActorName = FString("Ending Overlap : ") + OtherActor->GetName();
-	if (GEngine)
+	ASoulslikeCharacter* SoulslikeCharacter = Cast<ASoulslikeCharacter>(OtherActor);
+	if (SoulslikeCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Blue, OtherActorName);
+		SoulslikeCharacter->SetOverlappingItem(nullptr);
 	}
 }
 
