@@ -13,6 +13,7 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class AItem;
+class UAnimMontage;
 
 
 UCLASS()
@@ -25,6 +26,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	// Callbacks for Input
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* SoulslikeContext;
@@ -42,7 +45,7 @@ protected:
 	UInputAction* EKeyAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* AttackAction;
+	UInputAction* Attack1Action;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* DodgeAction;
@@ -53,6 +56,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EKeyPressed();
 
+	UFUNCTION(BlueprintCallable)
+	void Attack1();
+
+	// Play Montage Function
+	void PlayAttack1Montage();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+
+	bool CanAttack();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -62,8 +76,10 @@ public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;  }
 
 private:
-
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;
@@ -73,4 +89,7 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* Attack1Montage;
 };

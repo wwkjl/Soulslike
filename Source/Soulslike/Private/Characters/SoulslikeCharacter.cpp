@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapon/Weapon.h"
+#include "Animation/AnimMontage.h"
 
 ASoulslikeCharacter::ASoulslikeCharacter()
 {
@@ -79,6 +80,40 @@ void ASoulslikeCharacter::EKeyPressed()
 	}
 }
 
+void ASoulslikeCharacter::Attack1()
+{
+	if (CanAttack())
+	{
+		PlayAttack1Montage();
+		ActionState = EActionState::EAS_Attacking;
+	}
+	
+}
+
+void ASoulslikeCharacter::PlayAttack1Montage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && Attack1Montage)
+	{
+		const int32 SectionIndex = FMath::RandRange(1, 3);
+		FName SectionName = FName(*FString::Printf(TEXT("Attack%d"), SectionIndex));
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *SectionName.ToString());
+		AnimInstance->Montage_Play(Attack1Montage, 1.f);
+		AnimInstance->Montage_JumpToSection(SectionName, Attack1Montage);
+	}
+}
+
+void ASoulslikeCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+bool ASoulslikeCharacter::CanAttack()
+{
+	return 	ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_EquippedOneHandedWeapon;
+}
+
 void ASoulslikeCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -95,7 +130,7 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Jump);
 		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::EKeyPressed);
-		//EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack);
+		EnhancedInputComponent->BindAction(Attack1Action, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack1);
 		//EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 	}
 }
