@@ -46,7 +46,7 @@ void ASoulslikeCharacter::BeginPlay()
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
 {
-	//if (ActionState != EActionState::EAS_Unoccupied) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	const FRotator Rotation = Controller->GetControlRotation();
@@ -77,6 +77,25 @@ void ASoulslikeCharacter::EKeyPressed()
 	{
 		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		OverlappingItem = nullptr;
+		EquippedWeapon = OverlappingWeapon;
+		return;
+	}
+
+	if (CanDisarm())
+	{
+		PlayEquipMontage(FName("Unequip"));
+		CharacterState = ECharacterState::ECS_Unequipped;
+		ActionState = EActionState::EAS_EquippingWeapon;
+		return;
+	}
+	else if (CanArm())
+	{
+		PlayEquipMontage(FName("Equip"));
+		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		ActionState = EActionState::EAS_EquippingWeapon;
+		return;
+
 	}
 }
 
@@ -103,6 +122,17 @@ void ASoulslikeCharacter::PlayAttack1Montage()
 	}
 }
 
+
+void ASoulslikeCharacter::PlayEquipMontage(FName SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+		AnimInstance->Montage_Play(EquipMontage, 1.f);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
 void ASoulslikeCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
@@ -111,7 +141,41 @@ void ASoulslikeCharacter::AttackEnd()
 bool ASoulslikeCharacter::CanAttack()
 {
 	return 	ActionState == EActionState::EAS_Unoccupied &&
-		CharacterState == ECharacterState::ECS_EquippedOneHandedWeapon;
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ASoulslikeCharacter::CanDisarm()
+{
+	return 	ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ASoulslikeCharacter::CanArm()
+{
+	return 	ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+void ASoulslikeCharacter::Disarm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+	}
+}
+
+void ASoulslikeCharacter::Onarm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
+}
+
+void ASoulslikeCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)

@@ -14,6 +14,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class AItem;
 class UAnimMontage;
+class AWeapon;
 
 
 UCLASS()
@@ -64,8 +65,20 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
-
 	bool CanAttack();
+
+	void PlayEquipMontage(FName SectionName);
+	bool CanDisarm();
+	bool CanArm();
+
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
+	UFUNCTION(BlueprintCallable)
+	void Onarm();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -90,6 +103,12 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	AWeapon* EquippedWeapon;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* Attack1Montage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* EquipMontage;
 };
