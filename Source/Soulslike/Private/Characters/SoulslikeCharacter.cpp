@@ -205,6 +205,7 @@ void ASoulslikeCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Coll
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
 
