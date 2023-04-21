@@ -5,6 +5,7 @@
 #include "Soulslike/DebugMacros.h"
 #include "Components/SphereComponent.h"
 #include "Characters/SoulslikeCharacter.h"
+#include "NiagaraComponent.h"
 
 AItem::AItem()
 {
@@ -15,6 +16,9 @@ AItem::AItem()
 
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(GetRootComponent());
+
+	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	EmbersEffect->SetupAttachment(GetRootComponent());
 }
 
 void AItem::BeginPlay()

@@ -21,10 +21,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UGeometryCollectionComponent* GeometryCollection;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* Capsule;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	UGeometryCollectionComponent* GeometryCollection;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
+
+	bool bBroken = false;
 };

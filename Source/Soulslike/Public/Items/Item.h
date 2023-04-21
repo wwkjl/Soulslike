@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* OverlapSphere;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* EmbersEffect;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
