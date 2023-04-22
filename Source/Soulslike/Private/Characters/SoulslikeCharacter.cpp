@@ -76,7 +76,7 @@ void ASoulslikeCharacter::EKeyPressed()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 		OverlappingItem = nullptr;
 		EquippedWeapon = OverlappingWeapon;
@@ -117,7 +117,7 @@ void ASoulslikeCharacter::PlayAttack1Montage()
 	{
 		const int32 SectionIndex = FMath::RandRange(1, 3);
 		FName SectionName = FName(*FString::Printf(TEXT("Attack%d"), SectionIndex));
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *SectionName.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *SectionName.ToString());
 		AnimInstance->Montage_Play(Attack1Montage, 1.f);
 		AnimInstance->Montage_JumpToSection(SectionName, Attack1Montage);
 	}
