@@ -43,6 +43,8 @@ void ASoulslikeCharacter::BeginPlay()
 			Subsystem->AddMappingContext(SoulslikeContext, 0);
 		}
 	}
+
+	Tags.Add(FName("SoulslikeCharacter"));
 }
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
