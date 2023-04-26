@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "CharacterType.h"
 #include "SoulslikeCharacter.generated.h"
@@ -14,11 +14,10 @@ class USpringArmComponent;
 class UCameraComponent;
 class AItem;
 class UAnimMontage;
-class AWeapon;
 
 
 UCLASS()
-class SOULSLIKE_API ASoulslikeCharacter : public ACharacter
+class SOULSLIKE_API ASoulslikeCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -57,15 +56,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EKeyPressed();
 
-	UFUNCTION(BlueprintCallable)
-	void Attack1();
-
-	// Play Montage Function
-	void PlayAttack1Montage();
-
-	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
-	bool CanAttack();
+	virtual void Attack1() override;
+	virtual void PlayAttack1Montage() override;		//Play Montage Function
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
 
 	void PlayEquipMontage(FName SectionName);
 	bool CanDisarm();
@@ -84,8 +78,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
 
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;  }
@@ -104,12 +97,6 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
-
-	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	AWeapon* EquippedWeapon;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Montages")
-	UAnimMontage* Attack1Montage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* EquipMontage;

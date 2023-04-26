@@ -104,6 +104,8 @@ void ASoulslikeCharacter::EKeyPressed()
 
 void ASoulslikeCharacter::Attack1()
 {
+	Super::Attack1();
+
 	if (CanAttack())
 	{
 		PlayAttack1Montage();
@@ -114,6 +116,8 @@ void ASoulslikeCharacter::Attack1()
 
 void ASoulslikeCharacter::PlayAttack1Montage()
 {
+	Super::PlayAttack1Montage();
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && Attack1Montage)
 	{
@@ -201,13 +205,3 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		//EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 	}
 }
-
-void ASoulslikeCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeapon->IgnoreActors.Empty();
-	}
-}
-
