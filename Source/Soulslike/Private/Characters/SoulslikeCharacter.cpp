@@ -3,19 +3,20 @@
 
 #include "Characters/SoulslikeCharacter.h"
 #include "Components/InputComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapon/Weapon.h"
 #include "Animation/AnimMontage.h"
-#include "Components/BoxComponent.h"
+
 
 ASoulslikeCharacter::ASoulslikeCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -23,6 +24,12 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -44,7 +51,7 @@ void ASoulslikeCharacter::BeginPlay()
 		}
 	}
 
-	Tags.Add(FName("SoulslikeCharacter"));
+	Tags.Add(FName("EngageableTarget"));
 }
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
@@ -78,28 +85,27 @@ void ASoulslikeCharacter::EKeyPressed()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-		OverlappingItem = nullptr;
-		EquippedWeapon = OverlappingWeapon;
-		return;
+		EquipWeapon(OverlappingWeapon);
 	}
-
-	if (CanDisarm())
+	else
 	{
-		PlayEquipMontage(FName("Unequip"));
-		CharacterState = ECharacterState::ECS_Unequipped;
-		ActionState = EActionState::EAS_EquippingWeapon;
-		return;
+		if (CanDisarm())
+		{
+			Disarm();
+		}
+		else if (CanArm())
+		{
+			Enarm();
+		}
 	}
-	else if (CanArm())
-	{
-		PlayEquipMontage(FName("Equip"));
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-		ActionState = EActionState::EAS_EquippingWeapon;
-		return;
+}
 
-	}
+void ASoulslikeCharacter::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
 }
 
 void ASoulslikeCharacter::Attack1()
@@ -113,22 +119,6 @@ void ASoulslikeCharacter::Attack1()
 	}
 	
 }
-
-void ASoulslikeCharacter::PlayAttack1Montage()
-{
-	Super::PlayAttack1Montage();
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && Attack1Montage)
-	{
-		const int32 SectionIndex = FMath::RandRange(1, 3);
-		FName SectionName = FName(*FString::Printf(TEXT("Attack%d"), SectionIndex));
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *SectionName.ToString());
-		AnimInstance->Montage_Play(Attack1Montage, 1.f);
-		AnimInstance->Montage_JumpToSection(SectionName, Attack1Montage);
-	}
-}
-
 
 void ASoulslikeCharacter::PlayEquipMontage(FName SectionName)
 {
@@ -153,6 +143,7 @@ bool ASoulslikeCharacter::CanAttack()
 
 bool ASoulslikeCharacter::CanDisarm()
 {
+
 	return 	ActionState == EActionState::EAS_Unoccupied &&
 		CharacterState != ECharacterState::ECS_Unequipped;
 }
@@ -166,13 +157,27 @@ bool ASoulslikeCharacter::CanArm()
 
 void ASoulslikeCharacter::Disarm()
 {
+	PlayEquipMontage(FName("Unequip"));
+	CharacterState = ECharacterState::ECS_Unequipped;
+	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+void ASoulslikeCharacter::Enarm()
+{
+	PlayEquipMontage(FName("Equip"));
+	CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	ActionState = EActionState::EAS_EquippingWeapon;
+}
+
+void ASoulslikeCharacter::AttachWeaponToBack()
+{
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
 	}
 }
 
-void ASoulslikeCharacter::Onarm()
+void ASoulslikeCharacter::AttachWeaponToHand()
 {
 	if (EquippedWeapon)
 	{
@@ -183,12 +188,6 @@ void ASoulslikeCharacter::Onarm()
 void ASoulslikeCharacter::FinishEquipping()
 {
 	ActionState = EActionState::EAS_Unoccupied;
-}
-
-void ASoulslikeCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -204,4 +203,10 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(Attack1Action, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack1);
 		//EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 	}
+}
+
+void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+{
+	PlayHitSound(ImpactPoint);
+	SpawnHitParticles(ImpactPoint);
 }

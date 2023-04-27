@@ -25,20 +25,45 @@ protected:
 	virtual void Attack1();
 	virtual void Die();
 
-	virtual void PlayAttack1Montage();
-	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void PlayHitSound(const FVector& ImpactPoint);
 	void SpawnHitParticles(const FVector& ImpactPoint);
 	virtual void HandleDamage(float DamageAmount);
+	void DisableCapsue();
+
+	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+	virtual int32 PlayAttack1Montage();
+	virtual int32 PlayDeathMontage();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 
-	virtual bool CanAttack();
-
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	AWeapon* EquippedWeapon;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UAttributeComponent* Attributes;
+
+	virtual bool CanAttack();
+	bool IsAlive();
+
+
+public:	
+	virtual void Tick(float DeltaTime) override;
+
+
+private:
+	void PlayHitReactMontage(const FName& SectionName);
+	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
+
+	UPROPERTY(EditAnywhere, Category = "Sounds")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Visual Effects")
+	UParticleSystem* HitParticles;
 
 	// Animation Montages
 
@@ -51,21 +76,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* DeathMontage;
 
-	// Components
+	UPROPERTY(EditAnywhere, Category = "Montages")
+	TArray<FName> Attack1MontageSections;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAttributeComponent* Attributes;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
-
-private:
-	UPROPERTY(EditAnywhere, Category = "Sounds")
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = "Visual Effects")
-	UParticleSystem* HitParticles;
+	UPROPERTY(EditAnywhere, Category = "Montages")
+	TArray<FName> DeathMontageSections;
 };

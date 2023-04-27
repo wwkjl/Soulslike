@@ -56,38 +56,42 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void EKeyPressed();
 
+	// Combat
+
+	void EquipWeapon(AWeapon* Weapon);
 	virtual void Attack1() override;
-	virtual void PlayAttack1Montage() override;		//Play Montage Function
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
 
 	void PlayEquipMontage(FName SectionName);
 	bool CanDisarm();
 	bool CanArm();
-
-	UFUNCTION(BlueprintCallable)
 	void Disarm();
+	void Enarm();
 
 	UFUNCTION(BlueprintCallable)
-	void Onarm();
+	void AttachWeaponToBack();
+
+	UFUNCTION(BlueprintCallable)
+	void AttachWeaponToHand();
 
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 
 public:	
-	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
 
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;  }
+	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+	// Character Components
 
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;

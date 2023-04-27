@@ -2,10 +2,11 @@
 
 
 #include "Characters/BaseCharacter.h"
-#include "Components/BoxComponent.h"
 #include "Items/Weapon/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AttributeComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -13,6 +14,7 @@ ABaseCharacter::ABaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
 
 
@@ -30,8 +32,19 @@ void ABaseCharacter::Die()
 {
 }
 
-void ABaseCharacter::PlayAttack1Montage()
+int32 ABaseCharacter::PlayAttack1Montage()
 {
+	return PlayRandomMontageSection(Attack1Montage, Attack1MontageSections);
+}
+
+int32 ABaseCharacter::PlayDeathMontage()
+{
+	return PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+}
+
+void ABaseCharacter::DisableCapsue()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
@@ -113,6 +126,26 @@ void ABaseCharacter::HandleDamage(float DamageAmount)
 	}
 }
 
+void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && Montage)
+	{
+		AnimInstance->Montage_Play(Montage, 1.f);
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	}
+}
+
+int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
+{
+	if (SectionNames.Num() < 0) return -1;
+	const int32 MaxSectionIndex = SectionNames.Num() - 1;
+	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
+	PlayMontageSection(Montage, SectionNames[Selection]);
+
+	return Selection;		// returns section num
+}
+
 void ABaseCharacter::AttackEnd()
 {
 }
@@ -120,6 +153,11 @@ void ABaseCharacter::AttackEnd()
 bool ABaseCharacter::CanAttack()
 {
 	return false;
+}
+
+bool ABaseCharacter::IsAlive()
+{
+	return Attributes && Attributes->IsAlive();
 }
 
 void ABaseCharacter::Tick(float DeltaTime)
