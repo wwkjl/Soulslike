@@ -22,6 +22,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	// Combat
+
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack1();
 	virtual void Die();
 
@@ -31,9 +35,24 @@ protected:
 	virtual void HandleDamage(float DamageAmount);
 	void DisableCapsue();
 
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	double WarpTargetDistance = 75.f;
+
+	// Montage
+
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 	virtual int32 PlayAttack1Montage();
 	virtual int32 PlayDeathMontage();
+	void StopAttack1Montage();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();

@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 
+#include "Soulslike/DebugMacros.h"
+
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -22,6 +24,21 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	if (IsAlive() && Hitter)
+	{
+		DirectionalHitReact(Hitter->GetActorLocation());
+	}
+	else
+	{
+		Die();
+	}
+
+	PlayHitSound(ImpactPoint);
+	SpawnHitParticles(ImpactPoint);
 }
 
 void ABaseCharacter::Attack1()
@@ -40,6 +57,38 @@ int32 ABaseCharacter::PlayAttack1Montage()
 int32 ABaseCharacter::PlayDeathMontage()
 {
 	return PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+}
+
+void ABaseCharacter::StopAttack1Montage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Stop(0.25f, Attack1Montage);
+	}
+}
+
+FVector ABaseCharacter::GetTranslationWarpTarget()
+{
+	if (CombatTarget == nullptr) return FVector();
+
+	const FVector CombatTargetLocation = CombatTarget->GetActorLocation();
+	const FVector ActorLocation = GetActorLocation();
+
+	FVector TargetToMe = (ActorLocation - CombatTargetLocation).GetSafeNormal();
+	TargetToMe *= WarpTargetDistance;
+
+	DRAW_DEBUG_SPHERE(CombatTargetLocation + TargetToMe);
+	return CombatTargetLocation + TargetToMe;
+}
+
+FVector ABaseCharacter::GetRotationWarpTarget()
+{
+	if (CombatTarget)
+	{
+		return CombatTarget->GetActorLocation();
+	}
+	return FVector();
 }
 
 void ABaseCharacter::DisableCapsue()
@@ -79,13 +128,13 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 		Theta *= -1.f;
 	}
 
-	FName Section("FromFront");
+	FName Section("FromLeft");
 
-	if (Theta > -180.f && Theta < -45.f)
+	if (Theta > -180.f && Theta < 0.f)
 	{
 		Section = FName("FromLeft");
 	}
-	else if (Theta > 45.f && Theta < 180.f)
+	else if (Theta > 0.f && Theta < 180.f)
 	{
 		Section = FName("FromRight");
 	}

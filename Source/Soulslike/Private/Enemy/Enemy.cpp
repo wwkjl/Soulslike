@@ -66,6 +66,7 @@ void AEnemy::Die()
 	DisableCapsue();
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
@@ -218,28 +219,33 @@ void AEnemy::CheckPatrolTarget()
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	ShowHealthBar();
-
-	if (IsAlive())
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+	
+	if (!IsDead())
 	{
-		DirectionalHitReact(ImpactPoint);
+		ShowHealthBar();
 	}
-	else
-	{
-		Die();
-	}
-
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	ClearPatrolTimer();
+	ClearAttackTimer();
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	StopAttack1Montage();
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HandleDamage(DamageAmount);
 	CombatTarget = EventInstigator->GetPawn();
-	ChaseTarget();
+	if (!IsOutsideAttackRadius())
+	{
+		EnemyState = EEnemyState::EES_Attacking;
+	}
+	else
+	{
+		ChaseTarget();
+	}
+
 	return 0.0f;
 }
 
