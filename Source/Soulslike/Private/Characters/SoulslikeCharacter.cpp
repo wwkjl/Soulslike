@@ -4,6 +4,7 @@
 #include "Characters/SoulslikeCharacter.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/AttributeComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -12,6 +13,8 @@
 #include "Items/Item.h"
 #include "Items/Weapon/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "HUD/SoulslikeHUD.h"
+#include "HUD/SoulslikeOverlay.h"
 
 
 ASoulslikeCharacter::ASoulslikeCharacter()
@@ -52,6 +55,8 @@ void ASoulslikeCharacter::BeginPlay()
 	}
 
 	Tags.Add(FName("EngageableTarget"));
+
+	InitializeSoulslikeOverlay();
 }
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
@@ -169,6 +174,14 @@ void ASoulslikeCharacter::Enarm()
 	ActionState = EActionState::EAS_EquippingWeapon;
 }
 
+void ASoulslikeCharacter::Die()
+{
+	Super::Die();
+
+	ActionState = EActionState::EAS_Dead;
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void ASoulslikeCharacter::AttachWeaponToBack()
 {
 	if (EquippedWeapon)
@@ -210,10 +223,62 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
+void ASoulslikeCharacter::Jump()
+{
+	if (IsUnoccupied())
+	{
+		Super::Jump();
+	}
+}
+
 void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-	ActionState = EActionState::EAS_HitReaction;
+	if (Attributes && Attributes->GetHealthPercent() > 0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
+	
+}
+
+float ASoulslikeCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	HandleDamage(DamageAmount);
+	SetHUDHealth();
+	return DamageAmount;
+}
+
+void ASoulslikeCharacter::SetHUDHealth()
+{
+	if (SoulslikeOverlay && Attributes)
+	{
+		SoulslikeOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
+}
+
+void ASoulslikeCharacter::InitializeSoulslikeOverlay()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		ASoulslikeHUD* SoulslikeHUD = Cast<ASoulslikeHUD>(PlayerController->GetHUD());
+		if (SoulslikeHUD)
+		{
+			SoulslikeOverlay = SoulslikeHUD->GetSoulslikeOverlay();
+			if (SoulslikeOverlay && Attributes)
+			{
+				SoulslikeOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+				SoulslikeOverlay->SetStaminaBarPercent(1.f);
+				SoulslikeOverlay->SetGold(0);
+				SoulslikeOverlay->SetSoul(0);
+			}
+		}
+	}
+}
+
+bool ASoulslikeCharacter::IsUnoccupied()
+{
+	return ActionState == EActionState::EAS_Unoccupied;
 }

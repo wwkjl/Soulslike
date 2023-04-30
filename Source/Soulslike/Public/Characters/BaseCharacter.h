@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Characters/CharacterType.h"
 #include "BaseCharacter.generated.h"
 
 class AWeapon;
@@ -69,10 +70,14 @@ protected:
 	virtual bool CanAttack();
 	bool IsAlive();
 
+	UPROPERTY(BlueprintReadOnly)
+	TEnumAsByte<EDeathPose> DeathPose;
+
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }
 
 private:
 	void PlayHitReactMontage(const FName& SectionName);

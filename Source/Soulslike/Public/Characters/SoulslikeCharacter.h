@@ -14,6 +14,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class AItem;
 class UAnimMontage;
+class USoulslikeOverlay;
 
 
 UCLASS()
@@ -68,6 +69,7 @@ protected:
 	bool CanArm();
 	void Disarm();
 	void Enarm();
+	virtual void Die() override;
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
@@ -83,12 +85,19 @@ protected:
 
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Jump() override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
-	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState;  }
-	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
 private:
+	void SetHUDHealth();
+	void InitializeSoulslikeOverlay();
+	bool IsUnoccupied();
+
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -107,4 +116,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* EquipMontage;
+
+	UPROPERTY()
+	USoulslikeOverlay* SoulslikeOverlay;
+
 };

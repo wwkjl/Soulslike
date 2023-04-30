@@ -7,8 +7,7 @@
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
-
-#include "Soulslike/DebugMacros.h"
+#include "Characters/CharacterType.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -43,10 +42,16 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 void ABaseCharacter::Attack1()
 {
+	if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(FName("Dead"));
+	PlayDeathMontage();
 }
 
 int32 ABaseCharacter::PlayAttack1Montage()
@@ -56,7 +61,14 @@ int32 ABaseCharacter::PlayAttack1Montage()
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
-	return PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections);
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if (Pose < EDeathPose::EDP_Max)
+	{
+		DeathPose = Pose;
+	}
+
+	return Selection;
 }
 
 void ABaseCharacter::StopAttack1Montage()
@@ -78,7 +90,6 @@ FVector ABaseCharacter::GetTranslationWarpTarget()
 	FVector TargetToMe = (ActorLocation - CombatTargetLocation).GetSafeNormal();
 	TargetToMe *= WarpTargetDistance;
 
-	DRAW_DEBUG_SPHERE(CombatTargetLocation + TargetToMe);
 	return CombatTargetLocation + TargetToMe;
 }
 

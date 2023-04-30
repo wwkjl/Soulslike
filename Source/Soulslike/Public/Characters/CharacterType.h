@@ -16,6 +16,7 @@ enum class EActionState : uint8
 	EAS_HitReaction UMETA(DisplayName = "HitReaction"),
 	EAS_Attacking UMETA(DisplayName = "Attacking"),
 	EAS_EquippingWeapon UMETA(DisplayName = "EquippingWeapon"),
+	EAS_Dead UMETA(DisplayName = "Dead"),
 };
 
 UENUM(BlueprintType)
@@ -26,7 +27,7 @@ enum EDeathPose
 	EDP_DeathBackFly UMETA(DisplayName = "Death Back Fly"),
 	EDP_DeathRightFall UMETA(DisplayName = "Death Right Fall"),
 
-	EDP_Max UMETA(DisplayName = "DefaultMax"),
+	EDP_Max UMETA(DisplayName = "DefaultMax")
 };
 
 UENUM(BlueprintType)

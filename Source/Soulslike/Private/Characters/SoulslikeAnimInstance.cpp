@@ -26,5 +26,7 @@ void USoulslikeAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		GroundSpeed = UKismetMathLibrary::VSizeXY(SoulslikeCharacterMovement->Velocity);
 		IsFalling = SoulslikeCharacterMovement->IsFalling();
 		CharacterState = SoulslikeCharacter->GetCharacterState();
+		ActionState = SoulslikeCharacter->GetActionState();
+		DeathPose = SoulslikeCharacter->GetDeathPose();
 	}
 }

@@ -59,8 +59,9 @@ void AEnemy::Destroyed()
 
 void AEnemy::Die()
 {
+	Super::Die();
+
 	EnemyState = EEnemyState::EES_Dead;
-	PlayDeathMontage();
 	ClearAttackTimer();
 	HideHealthBar();
 	DisableCapsue();
@@ -112,6 +113,7 @@ AActor* AEnemy::ChoosePatrolTarget()
 void AEnemy::Attack1()
 {
 	Super::Attack1();
+	if (CombatTarget == nullptr) return;
 
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttack1Montage();
@@ -130,18 +132,6 @@ void AEnemy::HandleDamage(float DamageAmount)
 	{
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 	}
-}
-
-int32 AEnemy::PlayDeathMontage()
-{
-	const int32 Selection = Super::PlayDeathMontage();
-	TEnumAsByte<EDeathPose> Pose(Selection);
-	if (Pose < EDeathPose::EDP_Max)
-	{
-		DeathPose = Pose;
-	}
-
-	return Selection;
 }
 
 void AEnemy::AttackEnd()
@@ -231,6 +221,11 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	ClearAttackTimer();
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	StopAttack1Montage();
+
+	if (!IsOutsideAttackRadius() && !IsDead())
+	{
+		StartAttackTimer();
+	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
