@@ -10,6 +10,7 @@
 class UHealthBarComponent;
 class UPawnSensingComponent;
 
+
 UCLASS()
 class SOULSLIKE_API AEnemy : public ABaseCharacter
 {
@@ -102,6 +103,7 @@ private:
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 	void SpawnDefaultWeapon();
+	void SpawnSoul();
 
 	// Combat
 	
@@ -121,4 +123,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ChasingSpeed = 300.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class ASoul> SoulClass;
 };

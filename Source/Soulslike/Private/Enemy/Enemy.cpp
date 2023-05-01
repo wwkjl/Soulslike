@@ -9,6 +9,7 @@
 #include "AIController.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Items/Weapon/Weapon.h"
+#include "Items/Soul.h"
 
 
 AEnemy::AEnemy()
@@ -68,7 +69,9 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawnSoul();
 }
+
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
 {
@@ -329,6 +332,19 @@ void AEnemy::SpawnDefaultWeapon()
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
+	}
+}
+
+void AEnemy::SpawnSoul()
+{
+	UWorld* World = GetWorld();
+	if (World && SoulClass && Attributes)
+	{
+		ASoul* SpawnedSoul = World->SpawnActor<ASoul>(SoulClass, GetActorLocation(), GetActorRotation());
+		if (SpawnedSoul)
+		{
+			SpawnedSoul->SetSouls(Attributes->GetSouls());
+		}
 	}
 }
 

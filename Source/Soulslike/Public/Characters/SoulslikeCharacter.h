@@ -6,6 +6,7 @@
 #include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "CharacterType.h"
+#include "Interfaces/PickupInterface.h"
 #include "SoulslikeCharacter.generated.h"
 
 class UInputMappingContext;
@@ -15,15 +16,18 @@ class UCameraComponent;
 class AItem;
 class UAnimMontage;
 class USoulslikeOverlay;
+class ASoul;
+class ATreasure;
 
 
 UCLASS()
-class SOULSLIKE_API ASoulslikeCharacter : public ABaseCharacter
+class SOULSLIKE_API ASoulslikeCharacter : public ABaseCharacter, public IPickupInterface
 {
 	GENERATED_BODY()
 
 public:
 	ASoulslikeCharacter();
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,10 +63,12 @@ protected:
 
 	// Combat
 
+	void Dodge();
 	void EquipWeapon(AWeapon* Weapon);
 	virtual void Attack1() override;
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
+	virtual void DodgeEnd() override;
 
 	void PlayEquipMontage(FName SectionName);
 	bool CanDisarm();
@@ -88,8 +94,10 @@ public:
 	virtual void Jump() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddSouls(ASoul* Soul) override;
+	virtual void AddGolds(ATreasure* Gold) override;
 
-	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
@@ -97,6 +105,7 @@ private:
 	void SetHUDHealth();
 	void InitializeSoulslikeOverlay();
 	bool IsUnoccupied();
+	bool HasEnoughStamina();
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 

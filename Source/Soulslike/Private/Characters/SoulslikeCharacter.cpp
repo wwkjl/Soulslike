@@ -15,11 +15,13 @@
 #include "Animation/AnimMontage.h"
 #include "HUD/SoulslikeHUD.h"
 #include "HUD/SoulslikeOverlay.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 
 
 ASoulslikeCharacter::ASoulslikeCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -40,6 +42,15 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom);
+}
+
+void ASoulslikeCharacter::Tick(float DeltaTime)
+{
+	if (Attributes && SoulslikeOverlay && IsUnoccupied())
+	{
+		Attributes->RegenStamina(DeltaTime);
+		SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
 }
 
 void ASoulslikeCharacter::BeginPlay()
@@ -105,6 +116,20 @@ void ASoulslikeCharacter::EKeyPressed()
 	}
 }
 
+void ASoulslikeCharacter::Dodge()
+{
+	if (!IsUnoccupied() || !HasEnoughStamina()) return;
+
+	PlayDodgeMontage();
+	ActionState = EActionState::EAS_Dodge;
+	if (Attributes && SoulslikeOverlay)
+	{
+		Attributes->UseStamina(Attributes->GetDodgeCost());
+		SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
+
+
 void ASoulslikeCharacter::EquipWeapon(AWeapon* Weapon)
 {
 	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
@@ -137,6 +162,7 @@ void ASoulslikeCharacter::PlayEquipMontage(FName SectionName)
 
 void ASoulslikeCharacter::AttackEnd()
 {
+	Super::AttackEnd();
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
@@ -144,6 +170,12 @@ bool ASoulslikeCharacter::CanAttack()
 {
 	return 	ActionState == EActionState::EAS_Unoccupied &&
 		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+void ASoulslikeCharacter::DodgeEnd()
+{
+	Super::DodgeEnd();
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 bool ASoulslikeCharacter::CanDisarm()
@@ -219,7 +251,7 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Jump);
 		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::EKeyPressed);
 		EnhancedInputComponent->BindAction(Attack1Action, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack1);
-		//EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 	}
 }
 
@@ -248,6 +280,29 @@ float ASoulslikeCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 	HandleDamage(DamageAmount);
 	SetHUDHealth();
 	return DamageAmount;
+}
+
+void ASoulslikeCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void ASoulslikeCharacter::AddSouls(ASoul* Soul)
+{
+	if (Attributes && SoulslikeOverlay)
+	{
+		Attributes->AddSouls(Soul->GetSouls());
+		SoulslikeOverlay->SetSoul(Attributes->GetSouls());
+	}
+}
+
+void ASoulslikeCharacter::AddGolds(ATreasure* Gold)
+{
+	if (Attributes && SoulslikeOverlay)
+	{
+		Attributes->AddGolds(Gold->GetGold());
+		SoulslikeOverlay->SetGold(Attributes->GetGolds());
+	}
 }
 
 void ASoulslikeCharacter::SetHUDHealth()
@@ -281,4 +336,9 @@ void ASoulslikeCharacter::InitializeSoulslikeOverlay()
 bool ASoulslikeCharacter::IsUnoccupied()
 {
 	return ActionState == EActionState::EAS_Unoccupied;
+}
+
+bool ASoulslikeCharacter::HasEnoughStamina()
+{
+	return Attributes && Attributes->GetStamina() > Attributes->GetDodgeCost();
 }
