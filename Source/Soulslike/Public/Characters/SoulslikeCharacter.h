@@ -75,7 +75,7 @@ protected:
 	bool CanArm();
 	void Disarm();
 	void Enarm();
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();

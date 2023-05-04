@@ -28,7 +28,9 @@ protected:
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack1();
-	virtual void Die();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
 
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void PlayHitSound(const FVector& ImpactPoint);
@@ -36,7 +38,7 @@ protected:
 	virtual void HandleDamage(float DamageAmount);
 	void DisableCapsue();
 
-	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")

@@ -101,6 +101,10 @@ void ASoulslikeCharacter::EKeyPressed()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
+		if (EquippedWeapon)
+		{
+			EquippedWeapon->Destroy();
+		}
 		EquipWeapon(OverlappingWeapon);
 	}
 	else
@@ -206,9 +210,9 @@ void ASoulslikeCharacter::Enarm()
 	ActionState = EActionState::EAS_EquippingWeapon;
 }
 
-void ASoulslikeCharacter::Die()
+void ASoulslikeCharacter::Die_Implementation()
 {
-	Super::Die();
+	Super::Die_Implementation();
 
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

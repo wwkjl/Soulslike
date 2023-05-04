@@ -21,7 +21,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 	virtual void Attack1() override;
 	virtual bool CanAttack() override;
 	virtual void HandleDamage(float DamageAmount) override;
@@ -33,7 +33,7 @@ protected:
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 public:	
