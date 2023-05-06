@@ -25,7 +25,7 @@ AWeapon::AWeapon()
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
 }
 
-void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
+void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, bool isPlayingSound)
 {
 	ItemState = EItemState::EIS_Equipped;
 
@@ -33,7 +33,7 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOw
 	SetInstigator(NewInstigator);
 	AttachMeshToSocket(InParent, InSocketName);
 	DisableSphereCollision();
-	PlayEquipSound();
+	if(isPlayingSound) PlayEquipSound();
 	ActivateEmbers();
 }
 
@@ -87,9 +87,9 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 	if (BoxHit.GetActor())
 	{
-		if (ActorIsSameType(OtherActor)) return;
-
 		//UE_LOG(LogTemp, Warning, TEXT("%s"), *BoxHit.GetActor()->GetName());
+
+		if (ActorIsSameType(OtherActor)) return;
 
 		UGameplayStatics::ApplyDamage(
 			BoxHit.GetActor(),

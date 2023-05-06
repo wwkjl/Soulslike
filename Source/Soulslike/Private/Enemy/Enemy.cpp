@@ -113,6 +113,26 @@ AActor* AEnemy::ChoosePatrolTarget()
 	return nullptr;
 }
 
+void AEnemy::ChooseAttack()
+{
+	if (Attack2Montage)
+	{
+		const float AttackPercent = FMath::RandRange(0.f, 1.f);
+		if (AttackPercent > Attack2Ratio)
+		{
+			Attack1();
+		}
+		else
+		{
+			Attack2();
+		}
+	}
+	else
+	{
+		Attack1();
+	}
+}
+
 void AEnemy::Attack1()
 {
 	Super::Attack1();
@@ -120,6 +140,15 @@ void AEnemy::Attack1()
 
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttack1Montage();
+}
+
+
+void AEnemy::Attack2()
+{
+	if (CombatTarget == nullptr) return;
+
+	EnemyState = EEnemyState::EES_Engaged;
+	PlayAttack2Montage();
 }
 
 bool AEnemy::CanAttack()
@@ -143,6 +172,20 @@ void AEnemy::AttackEnd()
 
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
+}
+
+int32 AEnemy::PlayAttack2Montage()
+{
+	return PlayRandomMontageSection(Attack2Montage, Attack2MontageSections);
+}
+
+void AEnemy::StopAttack2Montage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Stop(0.25f, Attack2Montage);
+	}
 }
 
 void AEnemy::PawnSeen(APawn* SeenPawn)
@@ -330,7 +373,7 @@ void AEnemy::SpawnDefaultWeapon()
 	if (World && WeaponClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this, false);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
@@ -354,7 +397,7 @@ void AEnemy::StartAttackTimer()
 {
 	EnemyState = EEnemyState::EES_Attacking;
 	const float AttackTime = FMath::RandRange(AttackMin, AttackMax);
-	GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack1, AttackTime);
+	GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::ChooseAttack, AttackTime);
 }
 
 void AEnemy::ClearAttackTimer()

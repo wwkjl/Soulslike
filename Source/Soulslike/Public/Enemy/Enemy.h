@@ -27,6 +27,11 @@ protected:
 	virtual void HandleDamage(float DamageAmount) override;
 	virtual void AttackEnd() override;
 
+	void ChooseAttack();
+	void Attack2();
+	int32 PlayAttack2Montage();
+	void StopAttack2Montage();
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float DeathLifeSpan = 8.f;
 
@@ -126,7 +131,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ChasingSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float Attack2Ratio = 0.3f;
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<class ASoul> SoulClass;
+
+	// Animation Montages
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* Attack2Montage;
+
+	UPROPERTY(EditAnywhere, Category = "Montages")
+	TArray<FName> Attack2MontageSections;
 };
