@@ -26,6 +26,7 @@ protected:
 	virtual bool CanAttack() override;
 	virtual void HandleDamage(float DamageAmount) override;
 	virtual void AttackEnd() override;
+	bool IsTargetable_Implementation() const override;
 
 	void ChooseAttack();
 	void Attack2();
@@ -117,6 +118,7 @@ private:
 	
 	void StartAttackTimer();
 	void ClearAttackTimer();
+	bool IsTargetable = true;
 
 	FTimerHandle AttackTimer;
 

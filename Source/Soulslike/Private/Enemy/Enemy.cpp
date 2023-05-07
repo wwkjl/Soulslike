@@ -63,6 +63,7 @@ void AEnemy::Die_Implementation()
 	Super::Die_Implementation();
 
 	EnemyState = EEnemyState::EES_Dead;
+	IsTargetable = false;
 	ClearAttackTimer();
 	HideHealthBar();
 	DisableCapsue();
@@ -172,6 +173,11 @@ void AEnemy::AttackEnd()
 
 	EnemyState = EEnemyState::EES_NoState;
 	CheckCombatTarget();
+}
+
+bool AEnemy::IsTargetable_Implementation() const
+{
+	return IsTargetable;
 }
 
 int32 AEnemy::PlayAttack2Montage()

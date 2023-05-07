@@ -17,6 +17,7 @@
 #include "HUD/SoulslikeOverlay.h"
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
+#include "TargetSystemComponent.h"
 
 
 ASoulslikeCharacter::ASoulslikeCharacter()
@@ -42,6 +43,10 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom);
+
+	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(TEXT("TargetSystem"));
+	TargetSystem->TargetableActors = ABaseCharacter::StaticClass();
+	TargetSystem->LockedOnWidgetParentSocket = FName("LockOnTarget");
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)
@@ -94,6 +99,7 @@ void ASoulslikeCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerPitchInput(LookAxisVector.Y);
 	AddControllerYawInput(LookAxisVector.X);
+	TargetSystem->TargetActorWithAxisInput(LookAxisVector.X);
 }
 
 void ASoulslikeCharacter::EKeyPressed()
@@ -131,6 +137,11 @@ void ASoulslikeCharacter::Dodge()
 		Attributes->UseStamina(Attributes->GetDodgeCost());
 		SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
 	}
+}
+
+void ASoulslikeCharacter::LockOn()
+{
+	TargetSystem->TargetActor();
 }
 
 
@@ -256,6 +267,7 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::EKeyPressed);
 		EnhancedInputComponent->BindAction(Attack1Action, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack1);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::LockOn);
 	}
 }
 

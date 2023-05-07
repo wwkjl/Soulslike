@@ -18,6 +18,7 @@ class UAnimMontage;
 class USoulslikeOverlay;
 class ASoul;
 class ATreasure;
+class UTargetSystemComponent;
 
 
 UCLASS()
@@ -54,6 +55,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* DodgeAction;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* LockOnAction;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -64,6 +68,7 @@ protected:
 	// Combat
 
 	void Dodge();
+	void LockOn();
 	void EquipWeapon(AWeapon* Weapon);
 	virtual void Attack1() override;
 	virtual void AttackEnd() override;
@@ -119,6 +124,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* ViewCamera;
+
+	UPROPERTY(VisibleAnywhere)
+	UTargetSystemComponent* TargetSystem;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "TargetSystemTargetableInterface.h"
 #include "Characters/CharacterType.h"
 #include "BaseCharacter.generated.h"
 
@@ -14,7 +15,7 @@ class UAnimMontage;
 
 
 UCLASS()
-class SOULSLIKE_API ABaseCharacter : public ACharacter, public IHitInterface
+class SOULSLIKE_API ABaseCharacter : public ACharacter, public IHitInterface, public ITargetSystemTargetableInterface
 {
 	GENERATED_BODY()
 
