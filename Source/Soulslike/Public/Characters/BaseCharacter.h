@@ -24,6 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	bool isInvincible = false;
 
 	// Combat
 
@@ -64,6 +65,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void DodgeEnd();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DodgeInvincibleEnd();
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	AWeapon* EquippedWeapon;

@@ -60,6 +60,7 @@ protected:
 	UInputAction* LockOnAction;
 
 	void Move(const FInputActionValue& Value);
+	void MoveEnd(const  FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
@@ -74,12 +75,14 @@ protected:
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
 	virtual void DodgeEnd() override;
+	virtual void DodgeInvincibleEnd() override;
 
 	void PlayEquipMontage(FName SectionName);
 	bool CanDisarm();
 	bool CanArm();
 	void Disarm();
 	void Enarm();
+	void FaceTarget(FVector TargetVector);
 	virtual void Die_Implementation() override;
 
 	UFUNCTION(BlueprintCallable)
@@ -109,7 +112,9 @@ public:
 private:
 	void SetHUDHealth();
 	void InitializeSoulslikeOverlay();
+	void SetDodgeDirectionForward();
 	bool IsUnoccupied();
+	bool IsDead();
 	bool HasEnoughStamina();
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -137,4 +142,6 @@ private:
 	UPROPERTY()
 	USoulslikeOverlay* SoulslikeOverlay;
 
+	UPROPERTY()
+	FVector DodgeDirection;
 };

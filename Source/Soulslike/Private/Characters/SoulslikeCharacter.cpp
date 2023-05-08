@@ -73,6 +73,7 @@ void ASoulslikeCharacter::BeginPlay()
 	Tags.Add(FName("EngageableTarget"));
 
 	InitializeSoulslikeOverlay();
+	SetDodgeDirectionForward();
 }
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
@@ -91,6 +92,14 @@ void ASoulslikeCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(ForwardDirection, MovementVector.Y);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	AddMovementInput(RightDirection, MovementVector.X);
+
+	DodgeDirection = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X;
+	//UE_LOG(LogTemp, Warning, TEXT("%lf, %lf, %lf"), DodgeDirection.X, DodgeDirection.Y, DodgeDirection.Z);
+}
+
+void ASoulslikeCharacter::MoveEnd(const FInputActionValue& Value)
+{
+	SetDodgeDirectionForward();
 }
 
 void ASoulslikeCharacter::Look(const FInputActionValue& Value)
@@ -129,6 +138,9 @@ void ASoulslikeCharacter::EKeyPressed()
 void ASoulslikeCharacter::Dodge()
 {
 	if (!IsUnoccupied() || !HasEnoughStamina()) return;
+	const FRotator FacingRotator = DodgeDirection.Rotation();
+	SetActorRotation(FacingRotator);
+	isInvincible = true;
 
 	PlayDodgeMontage();
 	ActionState = EActionState::EAS_Dodge;
@@ -141,7 +153,10 @@ void ASoulslikeCharacter::Dodge()
 
 void ASoulslikeCharacter::LockOn()
 {
+	if (IsDead()) return;
+
 	TargetSystem->TargetActor();
+	CombatTarget = TargetSystem->IsLocked() ? TargetSystem->GetLockedOnTargetActor() : nullptr;
 }
 
 
@@ -159,6 +174,10 @@ void ASoulslikeCharacter::Attack1()
 
 	if (CanAttack())
 	{
+		if (CombatTarget)
+		{
+			FaceTarget(CombatTarget->GetActorLocation());
+		}
 		PlayAttack1Montage();
 		ActionState = EActionState::EAS_Attacking;
 	}
@@ -193,6 +212,11 @@ void ASoulslikeCharacter::DodgeEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
+void ASoulslikeCharacter::DodgeInvincibleEnd()
+{
+	Super::DodgeInvincibleEnd();
+}
+
 bool ASoulslikeCharacter::CanDisarm()
 {
 
@@ -221,10 +245,19 @@ void ASoulslikeCharacter::Enarm()
 	ActionState = EActionState::EAS_EquippingWeapon;
 }
 
+void ASoulslikeCharacter::FaceTarget(FVector TargetVector)
+{
+	FVector FacingDirection = TargetVector - GetActorLocation();
+	FacingDirection.Z = 0.f;
+	const FRotator FacingRotator = FacingDirection.Rotation();
+	SetActorRotation(FacingRotator);
+}
+
 void ASoulslikeCharacter::Die_Implementation()
 {
 	Super::Die_Implementation();
 
+	TargetSystem->TargetLockOff();
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
@@ -262,6 +295,7 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Move);
+		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Completed, this, &ASoulslikeCharacter::MoveEnd);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Jump);
 		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::EKeyPressed);
@@ -281,6 +315,11 @@ void ASoulslikeCharacter::Jump()
 
 void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
+	if (isInvincible)
+	{
+		return;
+	}
+
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -349,9 +388,22 @@ void ASoulslikeCharacter::InitializeSoulslikeOverlay()
 	}
 }
 
+void ASoulslikeCharacter::SetDodgeDirectionForward()
+{
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	DodgeDirection = ForwardDirection;
+}
+
 bool ASoulslikeCharacter::IsUnoccupied()
 {
 	return ActionState == EActionState::EAS_Unoccupied;
+}
+
+bool ASoulslikeCharacter::IsDead()
+{
+	return ActionState == EActionState::EAS_Dead;
 }
 
 bool ASoulslikeCharacter::HasEnoughStamina()
