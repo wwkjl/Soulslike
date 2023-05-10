@@ -85,6 +85,12 @@ protected:
 	void FaceTarget(FVector TargetVector);
 	virtual void Die_Implementation() override;
 
+	UFUNCTION()
+	void OnTargetOn(AActor* TargetActor);
+
+	UFUNCTION()
+	void OnTargetOff(AActor* TargetActor);
+
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToBack();
 
@@ -105,6 +111,9 @@ public:
 	virtual void SetOverlappingItem(AItem* Item) override;
 	virtual void AddSouls(ASoul* Soul) override;
 	virtual void AddGolds(ATreasure* Gold) override;
+
+	UPROPERTY(EditAnywhere)
+	float TargetMinimumDistance = 2000.f;
 
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE EActionState GetActionState() const { return ActionState; }

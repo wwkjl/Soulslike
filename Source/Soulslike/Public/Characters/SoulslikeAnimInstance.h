@@ -28,6 +28,9 @@ public:
 	float GroundSpeed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	float GroundDirection;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	bool IsFalling;
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
@@ -38,4 +41,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	TEnumAsByte<EDeathPose> DeathPose;
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta=(AllowPrivateAccess="true"))
+	float MovementOffsetYaw;
 };

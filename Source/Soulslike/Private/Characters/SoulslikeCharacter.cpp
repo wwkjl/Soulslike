@@ -47,6 +47,7 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(TEXT("TargetSystem"));
 	TargetSystem->TargetableActors = ABaseCharacter::StaticClass();
 	TargetSystem->LockedOnWidgetParentSocket = FName("LockOnTarget");
+	TargetSystem->MinimumDistanceToEnable = TargetMinimumDistance;
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)
@@ -74,6 +75,11 @@ void ASoulslikeCharacter::BeginPlay()
 
 	InitializeSoulslikeOverlay();
 	SetDodgeDirectionForward();
+	if (TargetSystem)
+	{
+		TargetSystem->OnTargetLockedOn.AddDynamic(this, &ASoulslikeCharacter::OnTargetOn);
+		TargetSystem->OnTargetLockedOff.AddDynamic(this, &ASoulslikeCharacter::OnTargetOff);
+	}
 }
 
 void ASoulslikeCharacter::Move(const FInputActionValue& Value)
@@ -153,10 +159,20 @@ void ASoulslikeCharacter::Dodge()
 
 void ASoulslikeCharacter::LockOn()
 {
-	if (IsDead()) return;
+	if (IsDead() || TargetSystem == nullptr) return;
 
 	TargetSystem->TargetActor();
-	CombatTarget = TargetSystem->IsLocked() ? TargetSystem->GetLockedOnTargetActor() : nullptr;
+
+	//if (TargetSystem->IsLocked())
+	//{
+	//	CombatTarget = TargetSystem->GetLockedOnTargetActor();
+	//	bUseControllerRotationYaw = true;
+	//}
+	//else
+	//{
+	//	CombatTarget = nullptr;
+	//	bUseControllerRotationYaw = false;
+	//}
 }
 
 
@@ -251,6 +267,18 @@ void ASoulslikeCharacter::FaceTarget(FVector TargetVector)
 	FacingDirection.Z = 0.f;
 	const FRotator FacingRotator = FacingDirection.Rotation();
 	SetActorRotation(FacingRotator);
+}
+
+void ASoulslikeCharacter::OnTargetOn(AActor* TargetActor)
+{
+	CombatTarget = TargetSystem->GetLockedOnTargetActor();
+	bUseControllerRotationYaw = true;
+}
+
+void ASoulslikeCharacter::OnTargetOff(AActor* TargetActor)
+{
+	CombatTarget = nullptr;
+	bUseControllerRotationYaw = false;
 }
 
 void ASoulslikeCharacter::Die_Implementation()

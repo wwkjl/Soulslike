@@ -21,12 +21,20 @@ void USoulslikeAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	if (SoulslikeCharacterMovement)
+	if (SoulslikeCharacter && SoulslikeCharacterMovement)
 	{
-		GroundSpeed = UKismetMathLibrary::VSizeXY(SoulslikeCharacterMovement->Velocity);
+		FVector Velocity = SoulslikeCharacterMovement->Velocity;
+		GroundSpeed = UKismetMathLibrary::VSizeXY(Velocity);
+		GroundDirection = CalculateDirection(Velocity, SoulslikeCharacter->GetActorRotation());
 		IsFalling = SoulslikeCharacterMovement->IsFalling();
 		CharacterState = SoulslikeCharacter->GetCharacterState();
 		ActionState = SoulslikeCharacter->GetActionState();
 		DeathPose = SoulslikeCharacter->GetDeathPose();
+
+		// Aim
+		//FRotator AimRotation = SoulslikeCharacter->GetBaseAimRotation();
+		//FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(Velocity);
+
+		//MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;
 	}
 }
