@@ -144,6 +144,12 @@ void ASoulslikeCharacter::EKeyPressed()
 void ASoulslikeCharacter::Dodge()
 {
 	if (!IsUnoccupied() || !HasEnoughStamina()) return;
+
+	if (TargetSystem && TargetSystem->IsLocked())
+	{
+		bUseControllerRotationYaw = false;
+	}
+
 	const FRotator FacingRotator = DodgeDirection.Rotation();
 	SetActorRotation(FacingRotator);
 	isInvincible = true;
@@ -225,6 +231,11 @@ bool ASoulslikeCharacter::CanAttack()
 void ASoulslikeCharacter::DodgeEnd()
 {
 	Super::DodgeEnd();
+
+	if (TargetSystem && TargetSystem->IsLocked())
+	{
+		bUseControllerRotationYaw = true;
+	}
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
