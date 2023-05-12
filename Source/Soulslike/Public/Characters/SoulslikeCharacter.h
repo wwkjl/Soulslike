@@ -125,6 +125,7 @@ private:
 	bool IsUnoccupied();
 	bool IsDead();
 	bool HasEnoughStamina();
+	void ChangeControllerRotationYaw(bool IsUsing);
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
@@ -133,13 +134,13 @@ private:
 
 	// Character Components
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* ViewCamera;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTargetSystemComponent* TargetSystem;
 
 	UPROPERTY(VisibleInstanceOnly)

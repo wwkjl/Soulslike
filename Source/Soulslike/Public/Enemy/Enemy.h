@@ -28,10 +28,13 @@ protected:
 	virtual void AttackEnd() override;
 	bool IsTargetable_Implementation() const override;
 
-	void ChooseAttack();
-	void Attack2();
+	virtual void ChooseAttack();
+	virtual void Attack2();
 	int32 PlayAttack2Montage();
 	void StopAttack2Montage();
+	bool IsOutsideCombatRadius();
+	bool IsOutsideAttackRadius();
+	bool InTargetRange(AActor* Target, double Radius);
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float DeathLifeSpan = 8.f;
@@ -101,14 +104,11 @@ private:
 	void LoseInterest();
 	void StartPatrolling();
 	void ChaseTarget();
-	bool IsOutsideCombatRadius();
-	bool IsOutsideAttackRadius();
 	bool IsChasing();
 	bool IsAttacking();
 	bool IsDead();
 	bool IsEngaged();
 	void ClearPatrolTimer();
-	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 	void SpawnDefaultWeapon();

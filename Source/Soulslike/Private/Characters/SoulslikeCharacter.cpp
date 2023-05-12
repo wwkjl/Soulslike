@@ -147,7 +147,7 @@ void ASoulslikeCharacter::Dodge()
 
 	if (TargetSystem && TargetSystem->IsLocked())
 	{
-		bUseControllerRotationYaw = false;
+		ChangeControllerRotationYaw(false);
 	}
 
 	const FRotator FacingRotator = DodgeDirection.Rotation();
@@ -168,17 +168,6 @@ void ASoulslikeCharacter::LockOn()
 	if (IsDead() || TargetSystem == nullptr) return;
 
 	TargetSystem->TargetActor();
-
-	//if (TargetSystem->IsLocked())
-	//{
-	//	CombatTarget = TargetSystem->GetLockedOnTargetActor();
-	//	bUseControllerRotationYaw = true;
-	//}
-	//else
-	//{
-	//	CombatTarget = nullptr;
-	//	bUseControllerRotationYaw = false;
-	//}
 }
 
 
@@ -234,7 +223,7 @@ void ASoulslikeCharacter::DodgeEnd()
 
 	if (TargetSystem && TargetSystem->IsLocked())
 	{
-		bUseControllerRotationYaw = true;
+		ChangeControllerRotationYaw(true);
 	}
 	ActionState = EActionState::EAS_Unoccupied;
 }
@@ -242,6 +231,11 @@ void ASoulslikeCharacter::DodgeEnd()
 void ASoulslikeCharacter::DodgeInvincibleEnd()
 {
 	Super::DodgeInvincibleEnd();
+
+	if (TargetSystem && TargetSystem->IsLocked())
+	{
+		ChangeControllerRotationYaw(true);
+	}
 }
 
 bool ASoulslikeCharacter::CanDisarm()
@@ -283,13 +277,13 @@ void ASoulslikeCharacter::FaceTarget(FVector TargetVector)
 void ASoulslikeCharacter::OnTargetOn(AActor* TargetActor)
 {
 	CombatTarget = TargetSystem->GetLockedOnTargetActor();
-	bUseControllerRotationYaw = true;
+	ChangeControllerRotationYaw(true);
 }
 
 void ASoulslikeCharacter::OnTargetOff(AActor* TargetActor)
 {
 	CombatTarget = nullptr;
-	bUseControllerRotationYaw = false;
+	ChangeControllerRotationYaw(false);
 }
 
 void ASoulslikeCharacter::Die_Implementation()
@@ -448,4 +442,15 @@ bool ASoulslikeCharacter::IsDead()
 bool ASoulslikeCharacter::HasEnoughStamina()
 {
 	return Attributes && Attributes->GetStamina() > Attributes->GetDodgeCost();
+}
+
+void ASoulslikeCharacter::ChangeControllerRotationYaw(bool IsUsing)
+{
+	if (CharacterState == ECharacterState::ECS_Unequipped)
+	{
+		bUseControllerRotationYaw = false;
+		return;
+	}
+
+	bUseControllerRotationYaw = IsUsing;
 }
