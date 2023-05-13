@@ -19,6 +19,7 @@ class USoulslikeOverlay;
 class ASoul;
 class ATreasure;
 class UTargetSystemComponent;
+class UPawnNoiseEmitterComponent;
 
 
 UCLASS()
@@ -142,6 +143,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTargetSystemComponent* TargetSystem;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnNoiseEmitterComponent* NoiseEmitter;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;

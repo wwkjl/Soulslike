@@ -43,3 +43,10 @@ enum class EEnemyState : uint8	//More Serious
 	EES_Engaged UMETA(DisplayName = "Engaged"),
 
 };
+
+UENUM(BlueprintType)
+enum class EBossPhase : uint8
+{
+	EBP_Phase1 UMETA(DisplayName = "Phase1"),
+	EBP_Phase2 UMETA(DisplayName = "Phase2"),
+};

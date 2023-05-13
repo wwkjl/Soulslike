@@ -10,6 +10,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Items/Weapon/Weapon.h"
 #include "Items/Soul.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 AEnemy::AEnemy()
@@ -30,7 +31,7 @@ AEnemy::AEnemy()
 	bUseControllerRotationRoll = false;
 
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("Pawn Sensing"));
-	PawnSensing->SightRadius = 1400.f;
+	PawnSensing->SightRadius = 2000.f;
 	PawnSensing->SetPeripheralVisionAngle(50.f);
 }
 
@@ -41,6 +42,7 @@ void AEnemy::BeginPlay()
 	if (PawnSensing)
 	{
 		PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
+		PawnSensing->OnHearNoise.AddDynamic(this, &AEnemy::NoiseHeard);
 	}
 
 	Tags.Add(FName("Enemy"));
@@ -195,16 +197,24 @@ void AEnemy::StopAttack2Montage()
 
 void AEnemy::PawnSeen(APawn* SeenPawn)
 {
-	const bool bShouldChaseTarget =
-		EnemyState != EEnemyState::EES_Dead &&
-		EnemyState != EEnemyState::EES_Chasing &&
-		EnemyState < EEnemyState::EES_Attacking &&
-		SeenPawn->ActorHasTag(FName("EngageableTarget"));
-
-	if (bShouldChaseTarget)
+	if (ShouldChaseTarget(SeenPawn))
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
 		CombatTarget = SeenPawn;
+		ClearPatrolTimer();
+		ChaseTarget();
+	}
+}
+
+void AEnemy::NoiseHeard(APawn* HeardActor, const FVector& Location, float Volume)
+{
+	if (ShouldChaseTarget(HeardActor))
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Location);
+		SetActorRotation(LookAtRotation);
+
+		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
+		CombatTarget = HeardActor;
 		ClearPatrolTimer();
 		ChaseTarget();
 	}
@@ -272,6 +282,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 	ClearAttackTimer();
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	StopAttack1Montage();
+	StopAttack2Montage();
 
 	if (!IsOutsideAttackRadius() && !IsDead())
 	{
@@ -292,7 +303,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		ChaseTarget();
 	}
 
-	return 0.0f;
+	return DamageAmount;
 }
 
 void AEnemy::PatrolTimerFinished()
@@ -365,6 +376,15 @@ bool AEnemy::IsDead()
 bool AEnemy::IsEngaged()
 {
 	return EnemyState == EEnemyState::EES_Engaged;
+}
+
+bool AEnemy::ShouldChaseTarget(AActor* Target)
+{
+	return
+		EnemyState != EEnemyState::EES_Dead &&
+		EnemyState != EEnemyState::EES_Chasing &&
+		EnemyState < EEnemyState::EES_Attacking &&
+		Target->ActorHasTag(FName("EngageableTarget"));
 }
 
 void AEnemy::ClearPatrolTimer()

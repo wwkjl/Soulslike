@@ -21,9 +21,8 @@ protected:
 	void ChooseAttack() override;
 	void Attack2() override;
 
-private:
 	bool IsOutsideMeleeRange();
-
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 

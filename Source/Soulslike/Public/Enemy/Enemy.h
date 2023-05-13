@@ -10,7 +10,6 @@
 class UHealthBarComponent;
 class UPawnSensingComponent;
 
-
 UCLASS()
 class SOULSLIKE_API AEnemy : public ABaseCharacter
 {
@@ -42,8 +41,17 @@ protected:
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
 
+	UFUNCTION()
+	void NoiseHeard(APawn* HeardActor, const FVector& Location, float Volume);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float PatrollingSpeed = 125.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ChasingSpeed = 300.f;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -108,6 +116,7 @@ private:
 	bool IsAttacking();
 	bool IsDead();
 	bool IsEngaged();
+	bool ShouldChaseTarget(AActor* Target);
 	void ClearPatrolTimer();
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
@@ -127,12 +136,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AttackMax = 1.f;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float PatrollingSpeed = 125.f;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float ChasingSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float Attack2Ratio = 0.3f;

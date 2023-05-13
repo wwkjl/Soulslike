@@ -5,6 +5,7 @@
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -48,6 +49,8 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 	TargetSystem->TargetableActors = ABaseCharacter::StaticClass();
 	TargetSystem->LockedOnWidgetParentSocket = FName("LockOnTarget");
 	TargetSystem->MinimumDistanceToEnable = TargetMinimumDistance;
+
+	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)
@@ -56,6 +59,7 @@ void ASoulslikeCharacter::Tick(float DeltaTime)
 	{
 		Attributes->RegenStamina(DeltaTime);
 		SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+		MakeNoise(1.f, this);
 	}
 }
 
@@ -365,6 +369,11 @@ void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint, AAct
 
 float ASoulslikeCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (isInvincible)
+	{
+		return 0.f;
+	}
+
 	HandleDamage(DamageAmount);
 	SetHUDHealth();
 	return DamageAmount;
