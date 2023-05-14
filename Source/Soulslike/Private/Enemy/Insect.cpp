@@ -27,17 +27,25 @@ void AInsect::Attack2()
 {
 	Super::Attack2();
 
+	ThrowProjectile();
+}
+
+bool AInsect::IsOutsideMeleeRange()
+{
+	return !InTargetRange(CombatTarget, MeleeRadius);
+}
+
+void AInsect::ThrowProjectile()
+{
 	if (ProjectileClass && CombatTarget)
 	{
 		FVector Location = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), CombatTarget->GetActorLocation());
 
 		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, Location, Rotation);
-		Projectile->SetOwner(this);
+		if (Projectile)
+		{
+			Projectile->SetOwner(this);
+		}
 	}
-}
-
-bool AInsect::IsOutsideMeleeRange()
-{
-	return !InTargetRange(CombatTarget, MeleeRadius);
 }

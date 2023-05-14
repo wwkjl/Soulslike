@@ -87,7 +87,7 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 	if (BoxHit.GetActor())
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *BoxHit.GetActor()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("3. %s"), *BoxHit.GetActor()->GetName());
 
 		if (ActorIsSameType(OtherActor)) return;
 

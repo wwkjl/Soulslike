@@ -53,6 +53,7 @@ protected:
 	virtual int32 PlayDeathMontage();
 	virtual void PlayDodgeMontage();
 	void StopAttack1Montage();
+	bool canHitReact();
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetTranslationWarpTarget();

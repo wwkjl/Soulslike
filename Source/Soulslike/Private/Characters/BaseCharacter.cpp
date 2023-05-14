@@ -85,6 +85,11 @@ void ABaseCharacter::StopAttack1Montage()
 	}
 }
 
+bool ABaseCharacter::canHitReact()
+{
+	return HitReactMontage != nullptr;
+}
+
 FVector ABaseCharacter::GetTranslationWarpTarget()
 {
 	if (CombatTarget == nullptr) return FVector();

@@ -272,21 +272,28 @@ void AEnemy::CheckPatrolTarget()
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
+	if (IsDead()) return;
+
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 	
 	if (!IsDead())
 	{
 		ShowHealthBar();
 	}
-	ClearPatrolTimer();
-	ClearAttackTimer();
-	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-	StopAttack1Montage();
-	StopAttack2Montage();
 
-	if (!IsOutsideAttackRadius() && !IsDead())
+	ClearPatrolTimer();
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (canHitReact())
 	{
-		StartAttackTimer();
+		ClearAttackTimer();
+		StopAttack1Montage();
+		StopAttack2Montage();
+
+		if (!IsOutsideAttackRadius() && !IsDead())
+		{
+			StartAttackTimer();
+		}
 	}
 }
 
@@ -428,6 +435,7 @@ void AEnemy::StartAttackTimer()
 void AEnemy::ClearAttackTimer()
 {
 	GetWorldTimerManager().ClearTimer(AttackTimer);
+
 }
 	
 

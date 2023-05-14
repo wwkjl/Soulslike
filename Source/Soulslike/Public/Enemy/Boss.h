@@ -19,17 +19,40 @@ class SOULSLIKE_API ABoss : public AInsect
 public:
 	ABoss();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	EBossPhase BossPhase = EBossPhase::EBP_Phase1;
+
 protected:
+	virtual void BeginPlay() override;
 	void ChooseAttack() override;
+	void Attack2() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsRush = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsJump = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	AWeapon* EquippedWeapon2;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	AWeapon* EquippedWeapon3;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon2CollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon3CollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+
 
 private:
 	void Transform();
+	void Engage();
 	void AttackRush();
 	void AttackJump();
 	void PlayMontageName(UAnimMontage* Montage);
-
-	bool IsRush = false;
-	bool IsJump = false;
+	void SpawnDefaultBossWeapon();
 	FVector AttackTargetLocation;
 
 	UFUNCTION(BlueprintCallable)
@@ -41,8 +64,11 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void AttackJumpEnd();
 
-	UPROPERTY(VisibleAnywhere, Category = "Combat")
-	EBossPhase BossPhase = EBossPhase::EBP_Phase1;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class AWeapon> WeaponClass2;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class AWeapon> WeaponClass3;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float RushSpeed = 1200.f;

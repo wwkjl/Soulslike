@@ -25,6 +25,7 @@ public:
 	void PlayEquipSound();
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 
+	UPROPERTY(VisibleAnywhere)
 	TArray<AActor*> IgnoreActors;
 
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }

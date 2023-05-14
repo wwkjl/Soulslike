@@ -20,15 +20,18 @@ public:
 protected:
 	void ChooseAttack() override;
 	void Attack2() override;
-
 	bool IsOutsideMeleeRange();
-private:
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	TSubclassOf<class AProjectile> ProjectileClass;
 
+	UFUNCTION(BlueprintCallable)
+	void ThrowProjectile();
+
+private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	double MeleeRadius = 150.f;
 };
