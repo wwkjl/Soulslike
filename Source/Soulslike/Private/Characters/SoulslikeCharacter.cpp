@@ -292,11 +292,11 @@ void ASoulslikeCharacter::OnTargetOff(AActor* TargetActor)
 
 void ASoulslikeCharacter::Die_Implementation()
 {
-	Super::Die_Implementation();
-
 	TargetSystem->TargetLockOff();
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Super::Die_Implementation();
 }
 
 void ASoulslikeCharacter::AttachWeaponToBack()

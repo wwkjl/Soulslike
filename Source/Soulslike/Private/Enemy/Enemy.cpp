@@ -61,6 +61,10 @@ void AEnemy::Destroyed()
 
 void AEnemy::Die_Implementation()
 {
+	//UE_LOG(LogTemp, Warning, TEXT("enum %d"), (uint8)EnemyState);
+
+	if (IsDead()) return;
+
 	Super::Die_Implementation();
 
 	EnemyState = EEnemyState::EES_Dead;
@@ -272,10 +276,10 @@ void AEnemy::CheckPatrolTarget()
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	if (IsDead()) return;
-
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 	
+	//UE_LOG(LogTemp, Warning, TEXT("Get Hit Enemy"));
+
 	if (!IsDead())
 	{
 		ShowHealthBar();
@@ -299,6 +303,11 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (!IsAlive())
+	{
+		return 0.f;
+	}
+
 	HandleDamage(DamageAmount);
 	CombatTarget = EventInstigator->GetPawn();
 	if (!IsOutsideAttackRadius())

@@ -24,8 +24,12 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void ChaseTarget() override;
 	void ChooseAttack() override;
 	void Attack2() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsFirstEngaged = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool IsRush = false;

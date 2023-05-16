@@ -27,7 +27,11 @@ void ABaseCharacter::BeginPlay()
 
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	if (IsAlive() && Hitter)
+	//UE_LOG(LogTemp, Warning, TEXT("GetHit Base"));
+
+	if (Hitter == nullptr) return;
+
+	if (IsAlive())
 	{
 		DirectionalHitReact(Hitter->GetActorLocation());
 	}
@@ -50,6 +54,8 @@ void ABaseCharacter::Attack1()
 
 void ABaseCharacter::Die_Implementation()
 {
+	//UE_LOG(LogTemp, Warning, TEXT("Die Base"));
+
 	Tags.Add(FName("Dead"));
 	PlayDeathMontage();
 }

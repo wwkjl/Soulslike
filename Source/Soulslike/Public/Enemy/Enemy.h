@@ -27,6 +27,7 @@ protected:
 	virtual void AttackEnd() override;
 	bool IsTargetable_Implementation() const override;
 
+	virtual void ChaseTarget();
 	virtual void ChooseAttack();
 	virtual void Attack2();
 	int32 PlayAttack2Montage();
@@ -111,7 +112,6 @@ private:
 	void ShowHealthBar();
 	void LoseInterest();
 	void StartPatrolling();
-	void ChaseTarget();
 	bool IsChasing();
 	bool IsAttacking();
 	bool IsDead();

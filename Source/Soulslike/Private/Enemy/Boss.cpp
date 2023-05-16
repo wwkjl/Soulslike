@@ -20,6 +20,19 @@ void ABoss::BeginPlay()
 	SpawnDefaultBossWeapon();
 }
 
+void ABoss::ChaseTarget()
+{
+	if (IsFirstEngaged)
+	{
+		Super::ChaseTarget();
+	}
+	else
+	{
+		IsFirstEngaged = true;
+		Engage();
+	}
+}
+
 void ABoss::ChooseAttack()
 {
 	if (BossPhase == EBossPhase::EBP_Phase1)	// Health more than 50, Phase 1
@@ -80,8 +93,6 @@ void ABoss::Transform()
 
 void ABoss::Engage()
 {
-	if (CombatTarget == nullptr) return;
-
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayMontageName(EngageMontage);
 }
