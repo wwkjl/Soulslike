@@ -41,6 +41,11 @@ bool UAttributeComponent::IsAlive()
 	return Health > 0.f;
 }
 
+bool UAttributeComponent::IsLessHealthRatio(float Ratio)
+{
+	return Health < MaxHealth * Ratio;
+}
+
 void UAttributeComponent::AddSouls(int32 NumberOfSouls)
 {
 	Souls += NumberOfSouls;

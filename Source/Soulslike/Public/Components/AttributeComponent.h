@@ -25,6 +25,7 @@ public:
 	void UseStamina(float StaminaCost);
 	void RegenStamina(float DeltaTime);
 	bool IsAlive();
+	bool IsLessHealthRatio(float Ratio);
 	void AddSouls(int32 NumberOfSouls);
 	void AddGolds(int32 AmountOfGolds);
 

@@ -80,6 +80,7 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("1. %s"), *OtherActor->GetName());
 	if (ActorIsSameType(OtherActor)) return;
 
 	FHitResult BoxHit;
@@ -87,6 +88,8 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 	if (BoxHit.GetActor())
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("2. %s"), *BoxHit.GetActor()->GetName());
+
 		if (ActorIsSameType(OtherActor)) return;
 
 		UGameplayStatics::ApplyDamage(
@@ -136,7 +139,7 @@ void AWeapon::BoxTrace(FHitResult& BoxHit)
 		End,
 		BoxTraceExtent,
 		BoxTraceStart->GetComponentRotation(),
-		ETraceTypeQuery::TraceTypeQuery1,
+		ETraceTypeQuery::TraceTypeQuery3,	//Custom Type to Ignore Landscape
 		false,
 		ActorsToIgnore,
 		bShowBoxDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,

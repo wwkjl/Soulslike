@@ -4,6 +4,7 @@
 #include "Enemy/Boss.h"
 #include "Items/Weapon/Weapon.h"
 #include "Components/BoxComponent.h"
+#include "Components/AttributeComponent.h"
 #include "Projectile/Projectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,6 +38,12 @@ void ABoss::ChooseAttack()
 {
 	if (BossPhase == EBossPhase::EBP_Phase1)	// Health more than 50, Phase 1
 	{
+		if (Attributes && Attributes->IsLessHealthRatio(0.5f))
+		{
+			Transform();
+			return;
+		}
+
 		if (IsOutsideMeleeRange())
 		{
 			Attack2();
@@ -50,11 +57,11 @@ void ABoss::ChooseAttack()
 	{
 		if (IsOutsideMeleeRange())
 		{
-			AttackJump();
+			AttackRush();
 		}
 		else
 		{
-			AttackRush();
+			AttackJump();
 		}
 	}
 }
@@ -87,8 +94,12 @@ void ABoss::SetWeapon3CollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 
 void ABoss::Transform()
 {
+	EnemyState = EEnemyState::EES_Engaged;
 	PlayMontageName(TransformMontage);
 	BossPhase = EBossPhase::EBP_Phase2;
+	AcceptanceRadius = 75.f;
+	WarpTargetDistance = 80.f;
+	MeleeRadius = 900.f;
 }
 
 void ABoss::Engage()

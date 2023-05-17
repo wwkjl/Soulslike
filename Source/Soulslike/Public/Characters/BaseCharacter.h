@@ -39,12 +39,18 @@ protected:
 	void SpawnHitParticles(const FVector& ImpactPoint);
 	virtual void HandleDamage(float DamageAmount);
 	void DisableCapsue();
+	virtual bool CanAttack();
+	bool IsAlive();
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float Defense = 0.f;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	double WarpTargetDistance = 75.f;
+
 
 	// Montage
 
@@ -78,9 +84,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
-
-	virtual bool CanAttack();
-	bool IsAlive();
 
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EDeathPose> DeathPose;

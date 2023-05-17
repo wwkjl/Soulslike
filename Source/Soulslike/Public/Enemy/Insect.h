@@ -31,7 +31,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ThrowProjectile();
 
-private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	double MeleeRadius = 150.f;
 };
