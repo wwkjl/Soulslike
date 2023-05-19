@@ -20,6 +20,7 @@ class ASoul;
 class ATreasure;
 class UTargetSystemComponent;
 class UPawnNoiseEmitterComponent;
+class UStaticMeshComponent;
 
 
 UCLASS()
@@ -60,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* LockOnAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* PotionAction;
+
 	void Move(const FInputActionValue& Value);
 	void MoveEnd(const  FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -71,6 +75,7 @@ protected:
 
 	void Dodge();
 	void LockOn();
+	void DrinkPotion();
 	void EquipWeapon(AWeapon* Weapon);
 	virtual void Attack1() override;
 	virtual void AttackEnd() override;
@@ -79,6 +84,7 @@ protected:
 	virtual void DodgeInvincibleEnd() override;
 
 	void PlayEquipMontage(FName SectionName);
+	void PlayPotionMontage();
 	bool CanDisarm();
 	bool CanArm();
 	void Disarm();
@@ -104,6 +110,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
+	UFUNCTION(BlueprintCallable)
+	void DrinkPotionEnd();
+
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Jump() override;
@@ -112,6 +121,7 @@ public:
 	virtual void SetOverlappingItem(AItem* Item) override;
 	virtual void AddSouls(ASoul* Soul) override;
 	virtual void AddGolds(ATreasure* Gold) override;
+	virtual void AddPotion() override;
 
 	UPROPERTY(EditAnywhere)
 	float TargetMinimumDistance = 2000.f;
@@ -125,7 +135,7 @@ private:
 	void SetDodgeDirectionForward();
 	bool IsUnoccupied();
 	bool IsDead();
-	bool HasEnoughStamina();
+	bool HasEnoughStamina(float Cost);
 	void ChangeControllerRotationYaw(bool IsUsing);
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -147,11 +157,17 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnNoiseEmitterComponent* NoiseEmitter;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* PotionMesh;
+
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* EquipMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* PotionMontage;
 
 	UPROPERTY()
 	USoulslikeOverlay* SoulslikeOverlay;

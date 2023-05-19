@@ -24,6 +24,7 @@ public:
 	void SetStaminaBarPercent(float Percent);
 	void SetGold(int32 Gold);
 	void SetSoul(int32 Soul);
+	void SetPotion(int32 Potion);
 
 private:
 	UPROPERTY(meta = (BindWIdget))
@@ -37,4 +38,7 @@ private:
 
 	UPROPERTY(meta = (BindWIdget))
 	UTextBlock* SoulCountText;
+
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* PotionCountText;
 };

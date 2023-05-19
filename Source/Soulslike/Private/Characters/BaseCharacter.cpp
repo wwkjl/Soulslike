@@ -33,10 +33,12 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 	if (IsAlive())
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("GetHit Base Directional Hitreact"));
 		DirectionalHitReact(Hitter->GetActorLocation());
 	}
 	else
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("GetHit Base Die"));
 		Die();
 	}
 
@@ -128,6 +130,7 @@ void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && HitReactMontage)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("HitRactMontage"));
 		AnimInstance->Montage_Play(HitReactMontage, 1.f);
 		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
 	}
@@ -166,8 +169,8 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 		Section = FName("FromRight");
 	}
 
+	//UE_LOG(LogTemp, Warning, TEXT("Do Montage"));
 	PlayHitReactMontage(Section);
-
 }
 
 void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)

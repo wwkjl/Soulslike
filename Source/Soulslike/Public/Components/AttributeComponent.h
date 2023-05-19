@@ -21,6 +21,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void Heal(float Point);
 	void ReceiveDamage(float Damage);
 	void UseStamina(float StaminaCost);
 	void RegenStamina(float DeltaTime);
@@ -28,13 +29,18 @@ public:
 	bool IsLessHealthRatio(float Ratio);
 	void AddSouls(int32 NumberOfSouls);
 	void AddGolds(int32 AmountOfGolds);
+	void AddPotion();
+	void UsePotion();
+	bool HasPotion();
 
 	float GetHealthPercent();
 	float GetStaminaPercent();
 	FORCEINLINE int32 GetGolds() const { return Golds; }
 	FORCEINLINE int32 GetSouls() const { return Souls; }
+	FORCEINLINE int32 GetPotions() const { return Potions;  }
 	FORCEINLINE float GetStamina() const { return Stamina; }
 	FORCEINLINE float GetDodgeCost() const { return DodgeCost; }
+	FORCEINLINE float GetAttackCost() const { return AttackCost; }
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
@@ -54,10 +60,19 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	int32 Souls;
+
+	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	int32 Potions;
 	
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 	float DodgeCost = 12.f;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
-	float StaminaRegenRate = 8.f;
+	float AttackCost = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	float PotionHealPoint = 40.f;
+
+	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	float StaminaRegenRate = 10.f;
 };

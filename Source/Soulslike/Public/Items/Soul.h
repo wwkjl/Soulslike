@@ -32,5 +32,5 @@ private:
 	int32 Souls;
 
 	UPROPERTY(EditAnywhere)
-	float DriftRate = -15.f;
+	float DriftRate = -25.f;
 };

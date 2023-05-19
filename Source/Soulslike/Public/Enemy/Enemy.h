@@ -120,8 +120,11 @@ private:
 	void ClearPatrolTimer();
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
-	void SpawnDefaultWeapon();
+	void EquipDefaultWeapon();
 	void SpawnSoul();
+	void SpawnPotion();
+	void SpawnWeapon();
+	void SpawnRandom();
 
 	// Combat
 	
@@ -139,9 +142,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float Attack2Ratio = 0.3f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	bool IsHumanoid = false;
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<class ASoul> SoulClass;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class APotion> PotionClass;
 
 	// Animation Montages
 

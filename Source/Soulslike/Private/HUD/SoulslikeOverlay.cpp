@@ -36,3 +36,11 @@ void USoulslikeOverlay::SetSoul(int32 Soul)
 		SoulCountText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Soul)));
 	}
 }
+
+void USoulslikeOverlay::SetPotion(int32 Potion)
+{
+	if (PotionCountText)
+	{
+		PotionCountText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Potion)));
+	}
+}

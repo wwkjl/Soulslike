@@ -51,6 +51,10 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 	TargetSystem->MinimumDistanceToEnable = TargetMinimumDistance;
 
 	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+
+	PotionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PotionMesh"));
+	PotionMesh->SetupAttachment(GetRootComponent());
+	PotionMesh->bHiddenInGame = true;
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)
@@ -77,6 +81,8 @@ void ASoulslikeCharacter::BeginPlay()
 
 	Tags.Add(FName("EngageableTarget"));
 
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	PotionMesh->AttachToComponent(GetMesh(), TransformRules, "LeftHandSocket");
 	InitializeSoulslikeOverlay();
 	SetDodgeDirectionForward();
 	if (TargetSystem)
@@ -147,7 +153,7 @@ void ASoulslikeCharacter::EKeyPressed()
 
 void ASoulslikeCharacter::Dodge()
 {
-	if (!IsUnoccupied() || !HasEnoughStamina()) return;
+	if (!IsUnoccupied() || !HasEnoughStamina(Attributes->GetDodgeCost())) return;
 
 	if (TargetSystem && TargetSystem->IsLocked())
 	{
@@ -174,6 +180,21 @@ void ASoulslikeCharacter::LockOn()
 	TargetSystem->TargetActor();
 }
 
+void ASoulslikeCharacter::DrinkPotion()
+{
+	if (!IsUnoccupied()) return;
+
+	if (Attributes && Attributes->HasPotion())
+	{
+		PotionMesh->SetHiddenInGame(false);
+		PlayPotionMontage();
+		Attributes->UsePotion();
+		ActionState = EActionState::EAS_Drinking;
+		SoulslikeOverlay->SetPotion(Attributes->GetPotions());
+		SoulslikeOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
+}
+
 
 void ASoulslikeCharacter::EquipWeapon(AWeapon* Weapon)
 {
@@ -195,6 +216,11 @@ void ASoulslikeCharacter::Attack1()
 		}
 		PlayAttack1Montage();
 		ActionState = EActionState::EAS_Attacking;
+		if (Attributes && SoulslikeOverlay)
+		{
+			Attributes->UseStamina(Attributes->GetAttackCost());
+			SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+		}
 	}
 	
 }
@@ -209,6 +235,15 @@ void ASoulslikeCharacter::PlayEquipMontage(FName SectionName)
 	}
 }
 
+void ASoulslikeCharacter::PlayPotionMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && PotionMontage)
+	{
+		AnimInstance->Montage_Play(PotionMontage, 1.f);
+	}
+}
+
 void ASoulslikeCharacter::AttackEnd()
 {
 	Super::AttackEnd();
@@ -218,7 +253,8 @@ void ASoulslikeCharacter::AttackEnd()
 bool ASoulslikeCharacter::CanAttack()
 {
 	return 	ActionState == EActionState::EAS_Unoccupied &&
-		CharacterState != ECharacterState::ECS_Unequipped;
+		CharacterState != ECharacterState::ECS_Unequipped &&
+		HasEnoughStamina(Attributes->GetAttackCost());
 }
 
 void ASoulslikeCharacter::DodgeEnd()
@@ -325,6 +361,12 @@ void ASoulslikeCharacter::HitReactEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
+void ASoulslikeCharacter::DrinkPotionEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+	PotionMesh->SetHiddenInGame(true);
+}
+
 void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -339,6 +381,7 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(Attack1Action, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Attack1);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::LockOn);
+		EnhancedInputComponent->BindAction(PotionAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::DrinkPotion);
 	}
 }
 
@@ -402,6 +445,15 @@ void ASoulslikeCharacter::AddGolds(ATreasure* Gold)
 	}
 }
 
+void ASoulslikeCharacter::AddPotion()
+{
+	if (Attributes && SoulslikeOverlay)
+	{
+		Attributes->AddPotion();
+		SoulslikeOverlay->SetPotion(Attributes->GetPotions());
+	}
+}
+
 void ASoulslikeCharacter::SetHUDHealth()
 {
 	if (SoulslikeOverlay && Attributes)
@@ -425,6 +477,7 @@ void ASoulslikeCharacter::InitializeSoulslikeOverlay()
 				SoulslikeOverlay->SetStaminaBarPercent(1.f);
 				SoulslikeOverlay->SetGold(0);
 				SoulslikeOverlay->SetSoul(0);
+				SoulslikeOverlay->SetPotion(3);
 			}
 		}
 	}
@@ -448,9 +501,9 @@ bool ASoulslikeCharacter::IsDead()
 	return ActionState == EActionState::EAS_Dead;
 }
 
-bool ASoulslikeCharacter::HasEnoughStamina()
+bool ASoulslikeCharacter::HasEnoughStamina(float Cost)
 {
-	return Attributes && Attributes->GetStamina() > Attributes->GetDodgeCost();
+	return Attributes && Attributes->GetStamina() > Cost;
 }
 
 void ASoulslikeCharacter::ChangeControllerRotationYaw(bool IsUsing)

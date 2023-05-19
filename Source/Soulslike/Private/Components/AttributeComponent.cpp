@@ -21,6 +21,11 @@ void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UAttributeComponent::Heal(float Point)
+{
+	Health = FMath::Clamp(Health + Point, 0.f, MaxHealth);
+}
+
 void UAttributeComponent::ReceiveDamage(float Damage)
 {
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
@@ -54,6 +59,22 @@ void UAttributeComponent::AddSouls(int32 NumberOfSouls)
 void UAttributeComponent::AddGolds(int32 AmountOfGolds)
 {
 	Golds += AmountOfGolds;
+}
+
+void UAttributeComponent::AddPotion()
+{
+	Potions++;
+}
+
+void UAttributeComponent::UsePotion()
+{
+	Potions--;
+	Heal(PotionHealPoint);
+}
+
+bool UAttributeComponent::HasPotion()
+{
+	return Potions > 0;
 }
 
 float UAttributeComponent::GetHealthPercent()

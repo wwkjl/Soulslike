@@ -10,6 +10,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Items/Weapon/Weapon.h"
 #include "Items/Soul.h"
+#include "Items/Potion.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -75,7 +76,7 @@ void AEnemy::Die_Implementation()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-	SpawnSoul();
+	SpawnRandom();
 }
 
 
@@ -290,6 +291,7 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 
 	if (canHitReact())
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("HitReact"));
 		ClearAttackTimer();
 		StopAttack1Montage();
 		StopAttack2Montage();
@@ -299,6 +301,10 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 			StartAttackTimer();
 		}
 	}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("HitReactNo"));
+	//}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -332,7 +338,7 @@ void AEnemy::InitializeEnemy()
 	EnemyController = Cast<AAIController>(GetController());
 	HideHealthBar();
 	MoveToTarget(PatrolTarget);
-	SpawnDefaultWeapon();
+	EquipDefaultWeapon();
 }
 
 void AEnemy::HideHealthBar()
@@ -408,7 +414,7 @@ void AEnemy::ClearPatrolTimer()
 	GetWorldTimerManager().ClearTimer(PatrolTimer);
 }
 
-void AEnemy::SpawnDefaultWeapon()
+void AEnemy::EquipDefaultWeapon()
 {
 	UWorld* World = GetWorld();
 	if (World && WeaponClass)
@@ -424,13 +430,61 @@ void AEnemy::SpawnSoul()
 	UWorld* World = GetWorld();
 	if (World && SoulClass && Attributes)
 	{
-		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 125.f);
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 120.f);
 		ASoul* SpawnedSoul = World->SpawnActor<ASoul>(SoulClass, SpawnLocation, GetActorRotation());
 		if (SpawnedSoul)
 		{
 			SpawnedSoul->SetSouls(Attributes->GetSouls());
 			SpawnedSoul->SetOwner(this);
 		}
+	}
+}
+
+void AEnemy::SpawnPotion()
+{
+	UWorld* World = GetWorld();
+	if (World && PotionClass && Attributes)
+	{
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 45.f);
+		APotion* SpawnedPotion = World->SpawnActor<APotion>(PotionClass, SpawnLocation, GetActorRotation());
+		if (SpawnedPotion)
+		{
+			SpawnedPotion->SetOwner(this);
+		}
+	}
+}
+
+void AEnemy::SpawnWeapon()
+{
+	UWorld* World = GetWorld();
+	if (World && WeaponClass && Attributes)
+	{
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+		AWeapon* SpawnedWeapon = World->SpawnActor<AWeapon>(WeaponClass, SpawnLocation, GetActorRotation());
+		if (SpawnedWeapon)
+		{
+			SpawnedWeapon->SetOwner(this);
+		}
+	}
+}
+
+void AEnemy::SpawnRandom()
+{
+	const int32 Selection = FMath::RandRange(0, 2);
+
+	switch (Selection)
+	{
+	case 0:
+		SpawnSoul();
+		return;
+	case 1:
+		SpawnPotion();
+		return;
+	case 2:
+		IsHumanoid ? SpawnWeapon() : SpawnSoul();
+		return;
+	default:
+		return;
 	}
 }
 
