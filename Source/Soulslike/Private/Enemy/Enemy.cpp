@@ -301,10 +301,6 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 			StartAttackTimer();
 		}
 	}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("HitReactNo"));
-	//}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

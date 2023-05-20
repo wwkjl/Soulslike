@@ -127,13 +127,7 @@ void ABaseCharacter::DisableCapsue()
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && HitReactMontage)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("HitRactMontage"));
-		AnimInstance->Montage_Play(HitReactMontage, 1.f);
-		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
-	}
+	PlayMontageSection(HitReactMontage, SectionName);
 }
 
 void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
@@ -160,11 +154,7 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 
 	FName Section("FromLeft");
 
-	if (Theta > -180.f && Theta < 0.f)
-	{
-		Section = FName("FromLeft");
-	}
-	else if (Theta > 0.f && Theta < 180.f)
+	if (Theta > 0.f && Theta < 180.f)
 	{
 		Section = FName("FromRight");
 	}

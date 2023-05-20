@@ -74,5 +74,5 @@ private:
 	float PotionHealPoint = 40.f;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
-	float StaminaRegenRate = 10.f;
+	float StaminaRegenRate = 15.f;
 };

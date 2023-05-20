@@ -27,6 +27,7 @@ protected:
 	virtual void ChaseTarget() override;
 	void ChooseAttack() override;
 	void Attack2() override;
+	void SpawnRandom() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool IsFirstEngaged = false;

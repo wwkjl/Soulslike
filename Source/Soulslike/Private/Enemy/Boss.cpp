@@ -74,6 +74,11 @@ void ABoss::Attack2()
 	PlayAttack2Montage();
 }
 
+void ABoss::SpawnRandom()
+{
+	SpawnSoul();
+}
+
 void ABoss::SetWeapon2CollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 {
 	if (EquippedWeapon2 && EquippedWeapon2->GetWeaponBox())
@@ -114,7 +119,8 @@ void ABoss::AttackRush()
 
 	EnemyState = EEnemyState::EES_Engaged;
 
-	AttackTargetLocation = CombatTarget->GetActorLocation();
+	//AttackTargetLocation = CombatTarget->GetActorLocation();
+	MoveToTarget(CombatTarget);
 	GetCharacterMovement()->MaxWalkSpeed = RushSpeed;
 	PlayMontageName(AttackRushMontage);
 }
@@ -125,7 +131,7 @@ void ABoss::AttackJump()
 
 	EnemyState = EEnemyState::EES_Engaged;
 
-	AttackTargetLocation = CombatTarget->GetActorLocation();
+	//AttackTargetLocation = CombatTarget->GetActorLocation();
 	PlayMontageName(AttackJumpMontage);
 }
 

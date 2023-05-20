@@ -25,11 +25,17 @@ protected:
 	virtual bool CanAttack() override;
 	virtual void HandleDamage(float DamageAmount) override;
 	virtual void AttackEnd() override;
-	bool IsTargetable_Implementation() const override;
+	virtual bool IsTargetable_Implementation() const override;
 
 	virtual void ChaseTarget();
 	virtual void ChooseAttack();
 	virtual void Attack2();
+	virtual void SpawnRandom();
+	void SpawnSoul();
+	void SpawnPotion();
+	void SpawnWeapon();
+	void MoveToTarget(AActor* Target);
+
 	int32 PlayAttack2Montage();
 	void StopAttack2Montage();
 	bool IsOutsideCombatRadius();
@@ -118,13 +124,8 @@ private:
 	bool IsEngaged();
 	bool ShouldChaseTarget(AActor* Target);
 	void ClearPatrolTimer();
-	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 	void EquipDefaultWeapon();
-	void SpawnSoul();
-	void SpawnPotion();
-	void SpawnWeapon();
-	void SpawnRandom();
 
 	// Combat
 	
