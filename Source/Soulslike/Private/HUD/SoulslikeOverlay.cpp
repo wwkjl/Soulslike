@@ -4,6 +4,7 @@
 #include "HUD/SoulslikeOverlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Enemy/Boss.h"
 
 void USoulslikeOverlay::SetHealthBarPercent(float Percent)
 {
@@ -42,5 +43,33 @@ void USoulslikeOverlay::SetPotion(int32 Potion)
 	if (PotionCountText)
 	{
 		PotionCountText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Potion)));
+	}
+}
+
+void USoulslikeOverlay::SetBossEngage(ABoss* Boss)
+{
+	if (BossProgressBar && BossName)
+	{
+		BossProgressBar->SetVisibility(ESlateVisibility::Visible);
+		BossName->SetVisibility(ESlateVisibility::Visible);
+
+		BossName->SetText(FText::FromName(Boss->GetBossName()));
+	}
+}
+
+void USoulslikeOverlay::SetBossBarPercent(float Percent)
+{
+	if (BossProgressBar)
+	{
+		BossProgressBar->SetPercent(Percent);
+	}
+}
+
+void USoulslikeOverlay::HideBossUI()
+{
+	if (BossProgressBar && BossName)
+	{
+		BossProgressBar->SetVisibility(ESlateVisibility::Hidden);
+		BossName->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

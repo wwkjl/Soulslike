@@ -8,10 +8,23 @@
 #include "Projectile/Projectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HUD/HealthBarComponent.h"
 
 
 ABoss::ABoss()
 {
+}
+
+void ABoss::HandleDamage(float DamageAmount)
+{
+	Super::HandleDamage(DamageAmount);
+
+	OnBossGetHit.Broadcast(Attributes->GetHealthPercent());
+}
+
+FName ABoss::GetBossName()
+{
+	return BossName;
 }
 
 void ABoss::BeginPlay()
@@ -77,6 +90,7 @@ void ABoss::Attack2()
 void ABoss::SpawnRandom()
 {
 	SpawnSoul();
+	OnBossDefeat.Broadcast(this);
 }
 
 void ABoss::SetWeapon2CollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
@@ -111,6 +125,7 @@ void ABoss::Engage()
 {
 	EnemyState = EEnemyState::EES_Engaged;
 	PlayMontageName(EngageMontage);
+	OnBossEngage.Broadcast(this);
 }
 
 void ABoss::AttackRush()

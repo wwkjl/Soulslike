@@ -10,6 +10,11 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossEngage, ABoss*, EngagedBoss);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossDefeat, ABoss*, DefeatedBoss);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossGetHit, float, BossHealthPercent);
+
 UCLASS()
 class SOULSLIKE_API ABoss : public AInsect
 {
@@ -19,8 +24,17 @@ class SOULSLIKE_API ABoss : public AInsect
 public:
 	ABoss();
 
+	virtual void HandleDamage(float DamageAmount) override;
+
+	FOnBossEngage OnBossEngage;
+	FOnBossDefeat OnBossDefeat;
+	FOnBossGetHit OnBossGetHit;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	EBossPhase BossPhase = EBossPhase::EBP_Phase1;
+
+	UFUNCTION()
+	FName GetBossName();
 
 protected:
 	virtual void BeginPlay() override;
@@ -89,4 +103,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* AttackJumpMontage;
+
+	UPROPERTY(VisibleAnywhere)
+	FName BossName = FName(TEXT("Golem"));
 };

@@ -19,6 +19,8 @@
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
 #include "TargetSystemComponent.h"
+#include "GameMode/SoulslikeGameMode.h"
+#include "Kismet/Gameplaystatics.h"
 
 
 ASoulslikeCharacter::ASoulslikeCharacter()
@@ -55,6 +57,8 @@ ASoulslikeCharacter::ASoulslikeCharacter()
 	PotionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PotionMesh"));
 	PotionMesh->SetupAttachment(GetRootComponent());
 	PotionMesh->bHiddenInGame = true;
+
+	SoulslikeGameMode = Cast<ASoulslikeGameMode>(UGameplayStatics::GetGameMode(this));
 }
 
 void ASoulslikeCharacter::Tick(float DeltaTime)
@@ -333,6 +337,8 @@ void ASoulslikeCharacter::Die_Implementation()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Super::Die_Implementation();
+
+	SoulslikeGameMode->LoseGame();
 }
 
 void ASoulslikeCharacter::AttachWeaponToBack()

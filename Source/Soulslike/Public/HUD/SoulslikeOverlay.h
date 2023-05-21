@@ -12,6 +12,8 @@
 
 class UProgressBar;
 class UTextBlock;
+class ABoss;
+class ASoulslikeCharacter;
 
 
 UCLASS()
@@ -25,6 +27,9 @@ public:
 	void SetGold(int32 Gold);
 	void SetSoul(int32 Soul);
 	void SetPotion(int32 Potion);
+	void SetBossEngage(ABoss* Boss);
+	void SetBossBarPercent(float Percent);
+	void HideBossUI();
 
 private:
 	UPROPERTY(meta = (BindWIdget))
@@ -41,4 +46,10 @@ private:
 
 	UPROPERTY(meta = (BindWIdget))
 	UTextBlock* PotionCountText;
+
+	UPROPERTY(meta = (BindWIdget))
+	UProgressBar* BossProgressBar;
+
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* BossName;
 };

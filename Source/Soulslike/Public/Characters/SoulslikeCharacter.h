@@ -21,6 +21,7 @@ class ATreasure;
 class UTargetSystemComponent;
 class UPawnNoiseEmitterComponent;
 class UStaticMeshComponent;
+class ASoulslikeGameMode;
 
 
 UCLASS()
@@ -138,6 +139,7 @@ private:
 	bool HasEnoughStamina(float Cost);
 	void ChangeControllerRotationYaw(bool IsUsing);
 
+	ASoulslikeGameMode* SoulslikeGameMode;
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))

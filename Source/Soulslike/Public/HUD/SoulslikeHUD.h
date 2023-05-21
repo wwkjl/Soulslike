@@ -8,6 +8,8 @@
 
 
 class USoulslikeOverlay;
+class ABoss;
+class ASoulslikeGameMode;
 
 
 UCLASS()
@@ -18,11 +20,22 @@ class SOULSLIKE_API ASoulslikeHUD : public AHUD
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnBossEngage(ABoss* EngagedBoss);
+
+	UFUNCTION()
+	void OnBossDefeat(ABoss* DefeatedBoss);
+
+	UFUNCTION()
+	void OnBossGetHit(float BossHealthPercent);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Soulslike")
 	TSubclassOf<USoulslikeOverlay> SoulslikeOverlayClass;
 
 	USoulslikeOverlay* SoulslikeOverlay;
+	ABoss* StageBoss;
+	ASoulslikeGameMode* SoulslikeGameMode;
 
 public:
 	FORCEINLINE USoulslikeOverlay* GetSoulslikeOverlay() const { return SoulslikeOverlay; }
