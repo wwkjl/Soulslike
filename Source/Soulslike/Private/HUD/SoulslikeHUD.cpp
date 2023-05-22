@@ -39,6 +39,11 @@ void ASoulslikeHUD::OnBossEngage(ABoss* EngagedBoss)
 	{
 		SoulslikeOverlay->SetBossEngage(EngagedBoss);
 	}
+
+	if (SoulslikeGameMode)
+	{
+		SoulslikeGameMode->BossEngage();
+	}
 }
 
 void ASoulslikeHUD::OnBossDefeat(ABoss* DefeatedBoss)
@@ -46,6 +51,7 @@ void ASoulslikeHUD::OnBossDefeat(ABoss* DefeatedBoss)
 	if (SoulslikeOverlay)
 	{
 		SoulslikeOverlay->HideBossUI();
+		SoulslikeOverlay->SetGameResultText(true);
 	}
 
 	if (SoulslikeGameMode)

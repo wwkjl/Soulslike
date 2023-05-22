@@ -73,3 +73,12 @@ void USoulslikeOverlay::HideBossUI()
 		BossName->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void USoulslikeOverlay::SetGameResultText(bool bWon)
+{
+	if (GameResultText)
+	{
+		FString Result = bWon ? FString("Game Clear!") : FString("Game Over...");
+		GameResultText->SetText(FText::FromString(Result));
+	}
+}

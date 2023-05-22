@@ -30,6 +30,7 @@ public:
 	void SetBossEngage(ABoss* Boss);
 	void SetBossBarPercent(float Percent);
 	void HideBossUI();
+	void SetGameResultText(bool bWon);
 
 private:
 	UPROPERTY(meta = (BindWIdget))
@@ -52,4 +53,7 @@ private:
 
 	UPROPERTY(meta = (BindWIdget))
 	UTextBlock* BossName;
+
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* GameResultText;
 };

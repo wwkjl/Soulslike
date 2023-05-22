@@ -338,7 +338,14 @@ void ASoulslikeCharacter::Die_Implementation()
 
 	Super::Die_Implementation();
 
-	SoulslikeGameMode->LoseGame();
+	if (SoulslikeGameMode)
+	{
+		SoulslikeGameMode->LoseGame();
+	}
+	if (SoulslikeOverlay)
+	{
+		SoulslikeOverlay->SetGameResultText(false);
+	}
 }
 
 void ASoulslikeCharacter::AttachWeaponToBack()
