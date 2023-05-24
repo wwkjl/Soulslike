@@ -24,7 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	bool isInvincible = false;
+	bool bIsInvincible = false;
 
 	// Combat
 

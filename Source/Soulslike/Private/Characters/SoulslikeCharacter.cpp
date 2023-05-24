@@ -65,7 +65,10 @@ void ASoulslikeCharacter::Tick(float DeltaTime)
 {
 	if (Attributes && SoulslikeOverlay && IsUnoccupied())
 	{
-		Attributes->RegenStamina(DeltaTime);
+		if (!bIsDash)
+		{
+			Attributes->RegenStamina(DeltaTime);
+		}
 		SoulslikeOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
 		MakeNoise(1.f, this);
 	}
@@ -100,6 +103,8 @@ void ASoulslikeCharacter::Move(const FInputActionValue& Value)
 {
 	if (ActionState != EActionState::EAS_Unoccupied) return;
 
+	bIsMoving = true;
+
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
@@ -119,6 +124,7 @@ void ASoulslikeCharacter::Move(const FInputActionValue& Value)
 
 void ASoulslikeCharacter::MoveEnd(const FInputActionValue& Value)
 {
+	bIsMoving = false;
 	SetDodgeDirectionForward();
 }
 
@@ -166,7 +172,7 @@ void ASoulslikeCharacter::Dodge()
 
 	const FRotator FacingRotator = DodgeDirection.Rotation();
 	SetActorRotation(FacingRotator);
-	isInvincible = true;
+	bIsInvincible = true;
 
 	PlayDodgeMontage();
 	ActionState = EActionState::EAS_Dodge;
@@ -197,6 +203,20 @@ void ASoulslikeCharacter::DrinkPotion()
 		SoulslikeOverlay->SetPotion(Attributes->GetPotions());
 		SoulslikeOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
 	}
+}
+
+void ASoulslikeCharacter::Dash()
+{
+	if (!bIsMoving) return;
+
+	bIsDash = true;
+	GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+}
+
+void ASoulslikeCharacter::DashEnd()
+{
+	bIsDash = false;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 
@@ -395,6 +415,8 @@ void ASoulslikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dodge);
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::LockOn);
 		EnhancedInputComponent->BindAction(PotionAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::DrinkPotion);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ASoulslikeCharacter::Dash);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &ASoulslikeCharacter::DashEnd);
 	}
 }
 
@@ -408,7 +430,7 @@ void ASoulslikeCharacter::Jump()
 
 void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	if (isInvincible)
+	if (bIsInvincible)
 	{
 		return;
 	}
@@ -425,7 +447,7 @@ void ASoulslikeCharacter::GetHit_Implementation(const FVector& ImpactPoint, AAct
 
 float ASoulslikeCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (isInvincible)
+	if (bIsInvincible)
 	{
 		return 0.f;
 	}

@@ -36,6 +36,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	bool bIsMoving = false;
+	bool bIsDash = false;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float DashSpeed = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float WalkSpeed = 600.f;
+
 	// Callbacks for Input
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -65,9 +74,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* PotionAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* DashAction;
+
+
 	void Move(const FInputActionValue& Value);
 	void MoveEnd(const  FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Dash();
+	void DashEnd();
 
 	UFUNCTION(BlueprintCallable)
 	void EKeyPressed();

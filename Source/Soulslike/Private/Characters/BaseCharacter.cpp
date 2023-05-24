@@ -221,12 +221,12 @@ void ABaseCharacter::AttackEnd()
 
 void ABaseCharacter::DodgeEnd()
 {
-	isInvincible = false;
+	bIsInvincible = false;
 }
 
 void ABaseCharacter::DodgeInvincibleEnd()
 {
-	isInvincible = false;
+	bIsInvincible = false;
 }
 
 bool ABaseCharacter::CanAttack()
